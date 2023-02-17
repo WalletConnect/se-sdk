@@ -1,24 +1,20 @@
 import { Core } from "@walletconnect/core";
-import { formatJsonRpcResult } from "@walletconnect/jsonrpc-utils";
+import { formatJsonRpcError } from "@walletconnect/jsonrpc-utils";
 import { SignClient } from "@walletconnect/sign-client";
 import { ICore, ISignClient, SessionTypes } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
 import { Wallet as CryptoWallet } from "@ethersproject/wallet";
 
-import {
-  expect,
-  describe,
-  it,
-  beforeEach,
-  vi,
-  beforeAll,
-  afterAll,
-} from "vitest";
-import { Web3Wallet, IWeb3Wallet } from "../src";
+import { expect, describe, it, beforeEach, beforeAll, afterAll } from "vitest";
+import { SingleEthereum, ISingleEthereum } from "../src";
 import {
   disconnect,
+  TEST_APPROVE_PARAMS,
   TEST_CORE_OPTIONS,
+  TEST_ETHEREUM_ADDRESS,
   TEST_ETHEREUM_CHAIN,
+  TEST_ETHEREUM_CHAIN_PARSED,
+  TEST_GOERLI_CHAIN_PARSED,
   TEST_NAMESPACES,
   TEST_REQUIRED_NAMESPACES,
   TEST_UPDATED_NAMESPACES,
@@ -26,7 +22,7 @@ import {
 
 describe("Sign Integration", () => {
   let core: ICore;
-  let wallet: IWeb3Wallet;
+  let wallet: ISingleEthereum;
   let dapp: ISignClient;
   let uriString: string;
   let sessionApproval: () => Promise<any>;
@@ -43,13 +39,16 @@ describe("Sign Integration", () => {
 
   beforeEach(async () => {
     core = new Core(TEST_CORE_OPTIONS);
-    dapp = await SignClient.init({ ...TEST_CORE_OPTIONS, name: "Dapp" });
+    dapp = await SignClient.init({
+      ...TEST_CORE_OPTIONS,
+      name: "Dapp",
+    });
     const { uri, approval } = await dapp.connect({
       requiredNamespaces: TEST_REQUIRED_NAMESPACES,
     });
     uriString = uri || "";
     sessionApproval = approval;
-    wallet = await Web3Wallet.init({
+    wallet = await SingleEthereum.init({
       core,
       name: "wallet",
       metadata: {} as any,
@@ -64,13 +63,11 @@ describe("Sign Integration", () => {
       new Promise((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
           const { id, params } = sessionProposal;
+          console.log("sessionProposal,,,", sessionProposal);
           session = await wallet.approveSession({
             id,
-            namespaces: TEST_NAMESPACES,
+            ...TEST_APPROVE_PARAMS,
           });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve(session);
         });
       }),
@@ -86,12 +83,9 @@ describe("Sign Integration", () => {
       new Promise<void>((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
           const { params } = sessionProposal;
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           await wallet.rejectSession({
             id: params.id,
-            reason: rejectionError,
+            error: rejectionError,
           });
           resolve();
         });
@@ -116,11 +110,8 @@ describe("Sign Integration", () => {
           const { id, params } = sessionProposal;
           session = await wallet.approveSession({
             id,
-            namespaces: TEST_NAMESPACES,
+            ...TEST_APPROVE_PARAMS,
           });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve(session);
         });
       }),
@@ -140,39 +131,10 @@ describe("Sign Integration", () => {
       }),
       wallet.updateSession({
         topic: session.topic,
-        namespaces: TEST_UPDATED_NAMESPACES,
+        chainId: TEST_GOERLI_CHAIN_PARSED,
+        accounts: [TEST_ETHEREUM_ADDRESS],
       }),
     ]);
-  });
-  it("should extend session", async () => {
-    // first pair and approve session
-    await Promise.all([
-      new Promise((resolve) => {
-        wallet.on("session_proposal", async (sessionProposal) => {
-          const { id, params } = sessionProposal;
-          session = await wallet.approveSession({
-            id,
-            namespaces: TEST_NAMESPACES,
-          });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
-          resolve(session);
-        });
-      }),
-      sessionApproval(),
-      wallet.pair({ uri: uriString }),
-    ]);
-
-    const prevExpiry = session.expiry;
-    const topic = session.topic;
-    vi.useFakeTimers();
-    // Fast-forward system time by 60 seconds after expiry was first set.
-    vi.setSystemTime(Date.now() + 60_000);
-    await wallet.extendSession({ topic });
-    const updatedExpiry = wallet.engine.signClient.session.get(topic).expiry;
-    expect(updatedExpiry).to.be.greaterThan(prevExpiry);
-    vi.useRealTimers();
   });
 
   it("should respond to session request", async () => {
@@ -183,16 +145,9 @@ describe("Sign Integration", () => {
           const { id, params } = sessionProposal;
           session = await wallet.approveSession({
             id,
-            namespaces: {
-              eip155: {
-                ...TEST_NAMESPACES.eip155,
-                accounts: [`${TEST_ETHEREUM_CHAIN}:${cryptoWallet.address}`],
-              },
-            },
+            chainId: TEST_ETHEREUM_CHAIN_PARSED,
+            accounts: [cryptoWallet.address],
           });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve(session);
         });
       }),
@@ -206,9 +161,10 @@ describe("Sign Integration", () => {
           const { id, params } = sessionRequest;
           const signTransaction = params.request.params[0];
           const signature = await cryptoWallet.signTransaction(signTransaction);
-          const response = await wallet.respondSessionRequest({
+          const response = await wallet.approveRequest({
+            id,
             topic: session.topic,
-            response: formatJsonRpcResult(id, signature),
+            result: signature,
           });
           resolve(response);
         });
@@ -247,16 +203,8 @@ describe("Sign Integration", () => {
           const { id, params } = sessionProposal;
           session = await wallet.approveSession({
             id,
-            namespaces: {
-              eip155: {
-                ...TEST_NAMESPACES.eip155,
-                accounts: [`${TEST_ETHEREUM_CHAIN}:${cryptoWallet.address}`],
-              },
-            },
+            ...TEST_APPROVE_PARAMS,
           });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve(session);
         });
       }),
@@ -273,7 +221,7 @@ describe("Sign Integration", () => {
           resolve();
         });
       }),
-      wallet.disconnectSession({ topic: session.topic, reason }),
+      wallet.disconnectSession({ topic: session.topic, error: reason }),
     ]);
   });
 
@@ -285,16 +233,8 @@ describe("Sign Integration", () => {
           const { id, params } = sessionProposal;
           session = await wallet.approveSession({
             id,
-            namespaces: {
-              eip155: {
-                ...TEST_NAMESPACES.eip155,
-                accounts: [`${TEST_ETHEREUM_CHAIN}:${cryptoWallet.address}`],
-              },
-            },
+            ...TEST_APPROVE_PARAMS,
           });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve(session);
         });
       }),
@@ -315,50 +255,6 @@ describe("Sign Integration", () => {
     ]);
   });
 
-  it("should emit session event", async () => {
-    // first pair and approve session
-    await Promise.all([
-      new Promise((resolve) => {
-        wallet.on("session_proposal", async (sessionProposal) => {
-          const { id, params } = sessionProposal;
-          session = await wallet.approveSession({
-            id,
-            namespaces: {
-              eip155: {
-                ...TEST_NAMESPACES.eip155,
-                accounts: [`${TEST_ETHEREUM_CHAIN}:${cryptoWallet.address}`],
-              },
-            },
-          });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
-          resolve(session);
-        });
-      }),
-      sessionApproval(),
-      wallet.pair({ uri: uriString }),
-    ]);
-    const sessionEvent = {
-      topic: session.topic,
-      event: {
-        name: "chainChanged",
-      },
-      chainId: TEST_REQUIRED_NAMESPACES.eip155.chains[0],
-    };
-    await Promise.all([
-      new Promise<void>((resolve) => {
-        dapp.events.on("session_event", (eventPayload) => {
-          const { topic, params } = eventPayload;
-          expect(topic).to.be.eq(sessionEvent.topic);
-          expect(params.event).to.toMatchObject(sessionEvent.event);
-          resolve();
-        });
-      }),
-      wallet.emitSessionEvent(sessionEvent),
-    ]);
-  });
-
   it("should get active sessions", async () => {
     // first pair and approve session
     await Promise.all([
@@ -367,16 +263,8 @@ describe("Sign Integration", () => {
           const { id, params } = sessionProposal;
           session = await wallet.approveSession({
             id,
-            namespaces: {
-              eip155: {
-                ...TEST_NAMESPACES.eip155,
-                accounts: [`${TEST_ETHEREUM_CHAIN}:${cryptoWallet.address}`],
-              },
-            },
+            ...TEST_APPROVE_PARAMS,
           });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve(session);
         });
       }),
@@ -398,9 +286,6 @@ describe("Sign Integration", () => {
           const proposals = wallet.getPendingSessionProposals();
           expect(proposals).to.be.exist;
           expect(Object.values(proposals).length).to.be.eq(1);
-          expect(proposals[0].requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve();
         });
       }),
@@ -416,16 +301,8 @@ describe("Sign Integration", () => {
           const { id, params } = sessionProposal;
           session = await wallet.approveSession({
             id,
-            namespaces: {
-              eip155: {
-                ...TEST_NAMESPACES.eip155,
-                accounts: [`${TEST_ETHEREUM_CHAIN}:${cryptoWallet.address}`],
-              },
-            },
+            ...TEST_APPROVE_PARAMS,
           });
-          expect(params.requiredNamespaces).to.toMatchObject(
-            TEST_REQUIRED_NAMESPACES
-          );
           resolve(session);
         });
       }),
@@ -447,7 +324,7 @@ describe("Sign Integration", () => {
         },
       ],
     };
-
+    let expectedError;
     await Promise.all([
       new Promise((resolve) => {
         wallet.on("session_request", async () => {
@@ -455,23 +332,26 @@ describe("Sign Integration", () => {
           const request = pendingRequests[0];
           const signTransaction = request.params.request.params[0];
           const signature = await cryptoWallet.signTransaction(signTransaction);
-          const response = await wallet.respondSessionRequest({
+          expectedError = formatJsonRpcError(request.id, signature);
+          const response = await wallet.rejectRequest({
             topic: session.topic,
-            response: formatJsonRpcResult(request.id, signature),
+            ...expectedError,
           });
           resolve(response);
           resolve(pendingRequests);
         });
       }),
       new Promise<void>(async (resolve) => {
-        const result = await dapp.request({
-          topic: session.topic,
-          request: requestParams,
-          chainId: TEST_ETHEREUM_CHAIN,
-        });
-        expect(result).to.be.exist;
-        expect(result).to.be.a("string");
-        resolve();
+        try {
+          await dapp.request({
+            topic: session.topic,
+            request: requestParams,
+            chainId: TEST_ETHEREUM_CHAIN,
+          });
+        } catch (e) {
+          expect(e).to.be.exist;
+          expect(e).to.toMatchObject(expectedError.error);
+        }
         resolve();
       }),
     ]);
