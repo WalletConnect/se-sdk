@@ -85,10 +85,9 @@ export abstract class ISingleEthereum {
   public abstract approveSession: ISingleEthereumEngine["approveSession"];
   public abstract rejectSession: ISingleEthereumEngine["rejectSession"];
   public abstract updateSession: ISingleEthereumEngine["updateSession"];
-  public abstract extendSession: ISingleEthereumEngine["extendSession"];
-  public abstract respondSessionRequest: ISingleEthereumEngine["respondSessionRequest"];
+  public abstract approveRequest: ISingleEthereumEngine["approveRequest"];
+  public abstract rejectRequest: ISingleEthereumEngine["rejectRequest"];
   public abstract disconnectSession: ISingleEthereumEngine["disconnectSession"];
-  public abstract emitSessionEvent: ISingleEthereumEngine["emitSessionEvent"];
   public abstract getActiveSessions: ISingleEthereumEngine["getActiveSessions"];
   public abstract getPendingSessionProposals: ISingleEthereumEngine["getPendingSessionProposals"];
   public abstract getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"];

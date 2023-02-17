@@ -86,41 +86,29 @@ export class SingleEthereum extends ISingleEthereum {
     }
   };
 
-  public extendSession: ISingleEthereum["extendSession"] = async (params) => {
+  public approveRequest: ISingleEthereum["approveRequest"] = async (params) => {
     try {
-      return await this.engine.extendSession(params);
+      return await this.engine.approveRequest(params);
     } catch (error: any) {
       this.logger.error(error.message);
       throw error;
     }
   };
 
-  public respondSessionRequest: ISingleEthereum["respondSessionRequest"] =
-    async (params) => {
-      try {
-        return await this.engine.respondSessionRequest(params);
-      } catch (error: any) {
-        this.logger.error(error.message);
-        throw error;
-      }
-    };
+  public rejectRequest: ISingleEthereum["rejectRequest"] = async (params) => {
+    try {
+      return await this.engine.rejectRequest(params);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
 
   public disconnectSession: ISingleEthereum["disconnectSession"] = async (
     params
   ) => {
     try {
       return await this.engine.disconnectSession(params);
-    } catch (error: any) {
-      this.logger.error(error.message);
-      throw error;
-    }
-  };
-
-  public emitSessionEvent: ISingleEthereum["emitSessionEvent"] = async (
-    params
-  ) => {
-    try {
-      return await this.engine.emitSessionEvent(params);
     } catch (error: any) {
       this.logger.error(error.message);
       throw error;
