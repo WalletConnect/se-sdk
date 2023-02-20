@@ -12,7 +12,7 @@ import {
   validateProposalChains,
   chainAlreadyInSession,
   formatAccounts,
-  formatChain,
+  prefixChainWithNamespace,
   parseChain,
   parseSessions,
   parseProposals,
@@ -48,12 +48,12 @@ export class Engine extends ISingleEthereumEngine {
     const { id, chainId, accounts } = params;
     const proposal = this.signClient.proposal.get(id);
     const approveParams = {
-      id: id,
+      id,
       namespaces: {
         [EVM_IDENTIFIER]: {
           ...proposal.requiredNamespaces[EVM_IDENTIFIER],
           accounts: formatAccounts(accounts, chainId),
-          chains: [formatChain(chainId)],
+          chains: [prefixChainWithNamespace(chainId)],
         },
       },
     };
@@ -82,7 +82,7 @@ export class Engine extends ISingleEthereumEngine {
   ) => {
     const { topic, chainId, accounts } = params;
     const session = this.signClient.session.get(topic);
-    const formattedChain = formatChain(chainId);
+    const formattedChain = prefixChainWithNamespace(chainId);
     const formattedAccounts = formatAccounts(accounts, chainId);
     if (!chainAlreadyInSession(session, chainId)) {
       const namespaces = session.namespaces[EVM_IDENTIFIER];
@@ -128,7 +128,7 @@ export class Engine extends ISingleEthereumEngine {
     const response = result.jsonrpc ? result : formatJsonRpcResult(id, result);
     return await this.signClient.respond({
       topic,
-      response: response,
+      response,
     });
   };
 
@@ -169,7 +169,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   private onSessionProposal = (event: SingleEthereumTypes.SessionProposal) => {
-    let proposal = parseProposal(event.params);
+    const proposal = parseProposal(event.params);
     try {
       validateProposalNamespaces(proposal);
     } catch (e) {

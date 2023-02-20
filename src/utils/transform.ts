@@ -13,7 +13,7 @@ export const parseChain = (chain: string) => {
   return isCaipFormatted(chain) ? chain.split(":")[1] : chain;
 };
 
-export const formatChain = (chain: number) => {
+export const prefixChainWithNamespace = (chain: number) => {
   return `${EVM_IDENTIFIER}:${chain}`;
 };
 
@@ -30,14 +30,14 @@ export const parseAccounts = (accounts: string[]) => {
 };
 
 export const parseSessions = (sessions: SessionTypes.Struct[]) => {
-  return sessions.reduce((sessions, session) => {
+  return sessions.reduce((sessionsMapping, session) => {
     const parsedSession = cloneObject(session);
     const chains = session.namespaces[EVM_IDENTIFIER].chains || [];
     const accounts = session.namespaces[EVM_IDENTIFIER].accounts;
     parsedSession.namespaces[EVM_IDENTIFIER].chains = parseChains(chains);
     parsedSession.namespaces[EVM_IDENTIFIER].accounts = parseAccounts(accounts);
-    sessions[session.topic] = parsedSession;
-    return sessions;
+    sessionsMapping[session.topic] = parsedSession;
+    return sessionsMapping;
   }, {});
 };
 

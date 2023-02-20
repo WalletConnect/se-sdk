@@ -1,6 +1,6 @@
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
 import { EVM_IDENTIFIER } from "../constants";
-import { formatChain } from "./transform";
+import { prefixChainWithNamespace } from "./transform";
 
 export const validateProposalNamespaces = (proposal: ProposalTypes.Struct) => {
   if (
@@ -36,6 +36,6 @@ export const chainAlreadyInSession = (
   chainId: number
 ) => {
   return session.namespaces?.[EVM_IDENTIFIER]?.chains?.includes(
-    formatChain(chainId)
+    prefixChainWithNamespace(chainId)
   );
 };
