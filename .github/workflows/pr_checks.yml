@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: "npm"
+          cache: "yarn"
           cache-dependency-path: "**yarn.lock"
       - name: install
         run: yarn install --frozen-lockfile
@@ -42,12 +42,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+          cache: "yarn"
+          cache-dependency-path: "**yarn.lock"
       - name: install
-        run: npm ci
+        run: yarn install --frozen-lockfile
       - name: check
-        run: npm run ${{ matrix.style-command }}
+        run: yarn ${{ matrix.style-command }}
 
   test:
     needs: [build, code_style]
@@ -62,11 +62,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: "npm"
-          cache-dependency-path: "**/package-lock.json"
+          cache: "yarn"
+          cache-dependency-path: "**yarn.lock"
       - name: install
-        run: npm ci
+        run: yarn install --frozen-lockfile
       - uses: actions/download-artifact@v3
         with:
           name: build-artifacts
-      - run: npm run test
+      - run: yarn test
