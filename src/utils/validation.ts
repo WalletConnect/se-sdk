@@ -9,7 +9,9 @@ export const validateProposalNamespaces = (proposal: ProposalTypes.Struct) => {
       (key) => key !== EVM_IDENTIFIER
     ).length > 0
   ) {
-    throw new Error("Invalid Session Proposal");
+    throw new Error(
+      "Invalid Session Proposal. Proposal contains non-EVM (`eip155`) namespaces."
+    );
   }
 };
 
@@ -23,7 +25,9 @@ export const validateProposalChains = (proposal: ProposalTypes.Struct) => {
     !eip155Chains ||
     eip155Chains.length > 1
   ) {
-    throw new Error("Invalid Session Chains");
+    throw new Error(
+      "Invalid Session Chains. Proposed either no `eip155` chains or more than one."
+    );
   }
 };
 
