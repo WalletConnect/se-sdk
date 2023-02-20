@@ -1,0 +1,8 @@
+{
+  "extends": "next/core-web-vitals",
+  "ignorePatterns": ["next.config.js"],
+  "rules": {
+    "no-console": "off",
+    "no-case-declarations": "off"
+  } 
+}
