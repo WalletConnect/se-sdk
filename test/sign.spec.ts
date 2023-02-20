@@ -63,7 +63,6 @@ describe("Sign Integration", () => {
       new Promise((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
           const { id, params } = sessionProposal;
-          console.log("sessionProposal,,,", sessionProposal);
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
