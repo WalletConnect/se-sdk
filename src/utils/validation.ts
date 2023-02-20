@@ -32,10 +32,10 @@ export const validateProposalChains = (proposal: ProposalTypes.Struct) => {
 };
 
 export const chainAlreadyInSession = (
-  sesion: SessionTypes.Struct,
+  session: SessionTypes.Struct,
   chainId: number
 ) => {
-  return sesion.namespaces?.[EVM_IDENTIFIER]?.chains?.includes(
+  return session.namespaces?.[EVM_IDENTIFIER]?.chains?.includes(
     formatChain(chainId)
   );
 };
