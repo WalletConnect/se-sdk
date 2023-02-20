@@ -1,4 +1,4 @@
-import { ErrorResponse, JsonRpcResponse } from "@walletconnect/jsonrpc-utils";
+import { ErrorResponse } from "@walletconnect/jsonrpc-utils";
 import {
   ISignClient,
   PendingRequestTypes,
@@ -23,43 +23,41 @@ export abstract class ISingleEthereumEngine {
   // approve a session proposal (SIGN)
   public abstract approveSession(params: {
     id: number;
-    namespaces: Record<string, SessionTypes.Namespace>;
-    relayProtocol?: string;
+    chainId: number;
+    accounts: string[];
   }): Promise<SessionTypes.Struct>;
 
   // reject a session proposal (SIGN)
   public abstract rejectSession(params: {
-    // proposerPublicKey: string;
     id: number;
-    reason: ErrorResponse;
+    error: ErrorResponse;
   }): Promise<void>;
 
   // update session namespaces (SIGN)
   public abstract updateSession(params: {
     topic: string;
-    namespaces: SessionTypes.Namespaces;
+    chainId: number;
+    accounts: string[];
   }): Promise<void>;
 
-  // update session expiry (SIGN)
-  public abstract extendSession(params: { topic: string }): Promise<void>;
-
-  // respond JSON-RPC request (SIGN)
-  public abstract respondSessionRequest(params: {
+  // approve JSON-RPC request (SIGN)
+  public abstract approveRequest(params: {
     topic: string;
-    response: JsonRpcResponse;
+    id: number;
+    result: any;
   }): Promise<void>;
 
-  // emit session events (SIGN)
-  public abstract emitSessionEvent(params: {
+  // reject session events (SIGN)
+  public abstract rejectRequest(params: {
     topic: string;
-    event: any; //SessionEvent;
-    chainId: string;
+    id: number;
+    error: ErrorResponse;
   }): Promise<void>;
 
   // disconnect a session (SIGN)
   public abstract disconnectSession(params: {
     topic: string;
-    reason: ErrorResponse;
+    error: ErrorResponse;
   }): Promise<void>;
 
   // query all active sessions (SIGN)

@@ -7,3 +7,5 @@ export const CLIENT_STORAGE_PREFIX = `${PROTOCOL}@${PROTOCOL_VERSION}:${CLIENT_C
 export const CLIENT_STORAGE_OPTIONS = {
   database: ":memory:",
 };
+
+export const EVM_IDENTIFIER = "eip155";
