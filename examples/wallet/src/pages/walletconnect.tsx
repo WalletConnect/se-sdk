@@ -1,9 +1,7 @@
 import PageHeader from "@/components/PageHeader";
 import QrReader from "@/components/QrReader";
-import { createLegacySignClient } from "@/utils/LegacyWalletConnectUtil";
 import { web3wallet } from "@/utils/WalletConnectUtil";
 import { Button, Input, Loading, Text } from "@nextui-org/react";
-import { parseUri } from "@walletconnect/utils";
 import { Fragment, useState } from "react";
 
 export default function WalletConnectPage() {
@@ -13,14 +11,7 @@ export default function WalletConnectPage() {
   async function onConnect(uri: string) {
     try {
       setLoading(true);
-      const { version } = parseUri(uri);
-
-      // Route the provided URI to the v1 SignClient if URI version indicates it, else use v2.
-      if (version === 1) {
-        createLegacySignClient({ uri });
-      } else {
-        await web3wallet.pair({ uri });
-      }
+      await web3wallet.pair({ uri });
     } catch (err: unknown) {
       alert(err);
     } finally {
@@ -35,7 +26,10 @@ export default function WalletConnectPage() {
 
       <QrReader onConnect={onConnect} />
 
-      <Text size={13} css={{ textAlign: "center", marginTop: "$10", marginBottom: "$10" }}>
+      <Text
+        size={13}
+        css={{ textAlign: "center", marginTop: "$10", marginBottom: "$10" }}
+      >
         or use walletconnect uri
       </Text>
 
@@ -44,7 +38,7 @@ export default function WalletConnectPage() {
         bordered
         aria-label="wc url connect input"
         placeholder="e.g. wc:a281567bb3e4..."
-        onChange={e => setUri(e.target.value)}
+        onChange={(e) => setUri(e.target.value)}
         value={uri}
         contentRight={
           <Button

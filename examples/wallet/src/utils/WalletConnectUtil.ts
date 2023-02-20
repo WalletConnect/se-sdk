@@ -11,17 +11,8 @@ export async function createWeb3Wallet() {
     core = new Core({
       projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
       logger: "debug",
+      relayUrl: process.env.NEXT_PUBLIC_RELAY_URL,
     });
-
-    // web3wallet = await Web3Wallet.init({
-    //   core,
-    //   metadata: {
-    //     name: 'React Wallet',
-    //     description: 'React Wallet for WalletConnect',
-    //     url: 'https://walletconnect.com/',
-    //     icons: ['https://avatars.githubusercontent.com/u/37784886']
-    //   }
-    // })
 
     web3wallet = await SingleEthereum.init({
       core,
