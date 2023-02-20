@@ -30,10 +30,9 @@
   "dependencies": {
     "@ethereumjs/tx": "^3.5.0",
     "@walletconnect/encoding": "^1.0.1",
-    "@walletconnect/types": "^2.1.4",
-    "@walletconnect/universal-provider": "^2.1.4",
-    "@walletconnect/utils": "^2.1.4",
-    "@web3modal/standalone": "^2.0.0-beta.10",
+    "@walletconnect/types": "^2.4.4",
+    "@walletconnect/ethereum-provider": "^2.4.4",
+    "@walletconnect/utils": "^2.4.4",
     "axios": "^0.21.1",
     "blockies-ts": "^1.0.0",
     "caip-api": "^2.0.0-beta.1",
