@@ -1,5 +1,4 @@
 import { ErrorResponse } from "@walletconnect/jsonrpc-utils";
-// import { ErrorResponse, JsonRpcResponse } from "@walletconnect/jsonrpc-utils";
 import {
   ISignClient,
   PendingRequestTypes,
