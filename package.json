@@ -25,7 +25,8 @@
     "build": "npm run build:pre; npm run build:source; npm run build:types",
     "test": "vitest run --dir test --no-threads",
     "lint": "eslint --fix './src/**/*.ts'",
-    "prettier": "prettier --check '{src,test}/**/*.{js,ts,jsx,tsx}'"
+    "prettier": "prettier --check '{src,test}/**/*.{js,ts,jsx,tsx}'",
+    "examples": "cd ./examples/dapp && yarn dev & cd ./examples/wallet && yarn dev"
   },
   "dependencies": {
     "@walletconnect/core": "^2.4.4",
