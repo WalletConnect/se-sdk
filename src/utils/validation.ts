@@ -5,9 +5,9 @@ import { formatChain } from "./transform";
 export const validateProposalNamespaces = (proposal: ProposalTypes.Struct) => {
   if (
     // if the proposal contains non EVM namespaces
-    Object.keys(proposal.requiredNamespaces).filter(
+    Object.keys(proposal.requiredNamespaces).some(
       (key) => key !== EVM_IDENTIFIER
-    ).length > 0
+    )
   ) {
     throw new Error(
       "Invalid Session Proposal. Proposal contains non-EVM (`eip155`) namespaces."
