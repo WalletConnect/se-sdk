@@ -4,20 +4,27 @@ import { proxy } from "valtio";
  * Types
  */
 interface State {
-  testNets: boolean
-  account: number
-  eip155Address: string
-  web3WalletReady: boolean
+  testNets: boolean;
+  account: number;
+  eip155Address: string;
+  web3WalletReady: boolean;
+  activeChainId: number;
+  activeSession: string;
 }
 
 /**
  * State
  */
 const state = proxy<State>({
-  testNets: typeof localStorage !== "undefined" ? Boolean(localStorage.getItem("TEST_NETS")) : true,
+  testNets:
+    typeof localStorage !== "undefined"
+      ? Boolean(localStorage.getItem("TEST_NETS"))
+      : true,
   account: 0,
   eip155Address: "",
   web3WalletReady: false,
+  activeChainId: 1,
+  activeSession: "",
 });
 
 /**
@@ -45,6 +52,14 @@ const SettingsStore = {
 
   setWeb3WalletReady(value: boolean) {
     state.web3WalletReady = value;
+  },
+
+  setActiveChainId(value: number) {
+    state.activeChainId = value;
+  },
+
+  setActiveSession(value: string) {
+    state.activeSession = value;
   },
 };
 

@@ -18,22 +18,39 @@ export default function HomePage() {
       <Text h4 css={{ marginBottom: "$5" }}>
         Mainnets
       </Text>
-      {Object.values(EIP155_MAINNET_CHAINS).map(({ name, logo, rgb }) => (
-        <AccountCard key={name} name={name} logo={logo} rgb={rgb} address={eip155Address} />
-      ))}
+      {Object.values(EIP155_MAINNET_CHAINS).map(
+        ({ name, logo, rgb, chainId }) => (
+          <AccountCard
+            key={name}
+            name={name}
+            logo={logo}
+            rgb={rgb}
+            chainId={chainId}
+            address={eip155Address}
+          />
+        )
+      )}
 
-      {testNets
-? (
+      {testNets ? (
         <Fragment>
           <Text h4 css={{ marginBottom: "$5" }}>
             Testnets
           </Text>
-          {Object.values(EIP155_TEST_CHAINS).map(({ name, logo, rgb }) => (
-            <AccountCard key={name} name={name} logo={logo} rgb={rgb} address={eip155Address} />
-          ))}
+
+          {Object.values(EIP155_TEST_CHAINS).map(
+            ({ name, logo, rgb, chainId }) => (
+              <AccountCard
+                key={name}
+                name={name}
+                logo={logo}
+                rgb={rgb}
+                chainId={chainId}
+                address={eip155Address}
+              />
+            )
+          )}
         </Fragment>
-      )
-: null}
+      ) : null}
     </Fragment>
   );
 }

@@ -6,6 +6,10 @@ import { Button, Divider, Loading, Row, Text } from "@nextui-org/react";
 import { getSdkError } from "@walletconnect/utils";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState } from "react";
+import SettingsStore from "@/store/SettingsStore";
+import { EIP155_MAINNET_CHAINS } from "@/data/EIP155Data";
+import AccountCard from "@/components/AccountCard";
+import { useSnapshot } from "valtio";
 
 /**
  * Component
@@ -15,10 +19,12 @@ export default function SessionPage() {
   const [updated, setUpdated] = useState(new Date());
   const { query, replace } = useRouter();
   const [loading, setLoading] = useState(false);
+  const { eip155Address } = useSnapshot(SettingsStore.state);
 
   useEffect(() => {
     if (query?.topic) {
       setTopic(query.topic as string);
+      SettingsStore.setActiveSession(query.topic as string);
     }
   }, [query]);
 
@@ -35,18 +41,11 @@ export default function SessionPage() {
   // Handle deletion of a session
   async function onDeleteSession() {
     setLoading(true);
-    await web3wallet.disconnectSession({ topic, reason: getSdkError("USER_DISCONNECTED") });
-    replace("/sessions");
-    setLoading(false);
-  }
-
-  async function onSessionEmit() {
-    setLoading(true);
-    await web3wallet.emitSessionEvent({
+    await web3wallet.disconnectSession({
       topic,
-      event: { name: "chainChanged", data: "Hello World" },
-      chainId: "eip155:1",
+      error: getSdkError("USER_DISCONNECTED"),
     });
+    replace("/sessions");
     setLoading(false);
   }
 
@@ -82,16 +81,35 @@ export default function SessionPage() {
 
       <Divider y={2} />
 
-      {Object.keys(namespaces).map(chain => {
+      {Object.keys(namespaces).map((chain) => {
         return (
           <Fragment key={chain}>
-            <Text h4 css={{ marginBottom: "$5" }}>{`Review ${chain} permissions`}</Text>
+            <Text
+              h4
+              css={{ marginBottom: "$5" }}
+            >{`Review ${chain} permissions`}</Text>
             <SessionChainCard namespace={namespaces[chain]} />
             {/* {renderAccountSelection(chain)} */}
             <Divider y={2} />
           </Fragment>
         );
       })}
+
+      <Text h4 css={{ marginBottom: "$5" }}>
+        Mainnets
+      </Text>
+      {Object.values(EIP155_MAINNET_CHAINS).map(
+        ({ name, logo, rgb, chainId }) => (
+          <AccountCard
+            key={name}
+            name={name}
+            chainId={chainId}
+            logo={logo}
+            rgb={rgb}
+            address={eip155Address}
+          />
+        )
+      )}
 
       <Row justify="space-between">
         <Text h5>Expiry</Text>
@@ -104,19 +122,22 @@ export default function SessionPage() {
       </Row>
 
       <Row css={{ marginTop: "$10" }}>
-        <Button flat css={{ width: "100%" }} color="error" onPress={onDeleteSession}>
+        <Button
+          flat
+          css={{ width: "100%" }}
+          color="error"
+          onPress={onDeleteSession}
+        >
           {loading ? <Loading size="sm" color="error" /> : "Delete"}
         </Button>
       </Row>
-
       <Row css={{ marginTop: "$10" }}>
-        <Button flat css={{ width: "100%" }} color="secondary" onPress={onSessionEmit}>
-          {loading ? <Loading size="sm" color="secondary" /> : "Emit"}
-        </Button>
-      </Row>
-
-      <Row css={{ marginTop: "$10" }}>
-        <Button flat css={{ width: "100%" }} color="warning" onPress={onSessionUpdate}>
+        <Button
+          flat
+          css={{ width: "100%" }}
+          color="warning"
+          onPress={onSessionUpdate}
+        >
           {loading ? <Loading size="sm" color="warning" /> : "Update"}
         </Button>
       </Row>

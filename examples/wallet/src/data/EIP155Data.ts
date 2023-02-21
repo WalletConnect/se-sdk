@@ -6,7 +6,7 @@
 /**
  * Types
  */
-export type TEIP155Chain = keyof typeof EIP155_CHAINS
+export type TEIP155Chain = keyof typeof EIP155_CHAINS;
 
 /**
  * Chains
@@ -18,13 +18,6 @@ export const EIP155_MAINNET_CHAINS = {
     logo: "/chain-logos/eip155-1.png",
     rgb: "99, 125, 234",
     rpc: "https://cloudflare-eth.com/",
-  },
-  "eip155:43114": {
-    chainId: 43114,
-    name: "Avalanche C-Chain",
-    logo: "/chain-logos/eip155-43113.png",
-    rgb: "232, 65, 66",
-    rpc: "https://api.avax.network/ext/bc/C/rpc",
   },
   "eip155:137": {
     chainId: 137,
@@ -50,13 +43,6 @@ export const EIP155_TEST_CHAINS = {
     rgb: "99, 125, 234",
     rpc: "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
   },
-  "eip155:43113": {
-    chainId: 43113,
-    name: "Avalanche Fuji",
-    logo: "/chain-logos/eip155-43113.png",
-    rgb: "232, 65, 66",
-    rpc: "https://api.avax-test.network/ext/bc/C/rpc",
-  },
   "eip155:80001": {
     chainId: 80001,
     name: "Polygon Mumbai",
@@ -73,7 +59,10 @@ export const EIP155_TEST_CHAINS = {
   },
 };
 
-export const EIP155_CHAINS = { ...EIP155_MAINNET_CHAINS, ...EIP155_TEST_CHAINS };
+export const EIP155_CHAINS = {
+  ...EIP155_MAINNET_CHAINS,
+  ...EIP155_TEST_CHAINS,
+};
 
 /**
  * Methods
