@@ -13,7 +13,7 @@ export declare namespace SingleEthereumTypes {
   }
 
   type SessionRequest = BaseEventArgs<{
-    request: { method: string; params: any };
+    request: { method: string; params: unknown };
     chainId: string;
   }>;
 

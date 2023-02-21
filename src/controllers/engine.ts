@@ -44,7 +44,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public approveSession: ISingleEthereumEngine["approveSession"] = async (
-    params
+    params,
   ) => {
     const { id, chainId, accounts } = params;
     const proposal = this.signClient.proposal.get(id);
@@ -60,7 +60,7 @@ export class Engine extends ISingleEthereumEngine {
     };
 
     const { topic, acknowledged } = await this.signClient.approve(
-      approveParams
+      approveParams,
     );
     await acknowledged();
 
@@ -70,7 +70,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public rejectSession: ISingleEthereumEngine["rejectSession"] = async (
-    params
+    params,
   ) => {
     return await this.signClient.reject({
       id: params.id,
@@ -79,7 +79,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public updateSession: ISingleEthereumEngine["updateSession"] = async (
-    params
+    params,
   ) => {
     const { topic, chainId, accounts } = params;
     const session = this.signClient.session.get(topic);
@@ -125,7 +125,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public approveRequest: ISingleEthereumEngine["approveRequest"] = async (
-    params
+    params,
   ) => {
     const { topic, id, result } = params;
 
@@ -137,7 +137,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public rejectRequest: ISingleEthereumEngine["rejectRequest"] = async (
-    params
+    params,
   ) => {
     const { topic, id, error } = params;
     return await this.signClient.respond({
@@ -147,7 +147,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public disconnectSession: ISingleEthereumEngine["disconnectSession"] = async (
-    params
+    params,
   ) => {
     await this.signClient.disconnect({
       topic: params.topic,
@@ -201,7 +201,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   private onSessionDelete = async (
-    event: SingleEthereumTypes.SessionDelete
+    event: SingleEthereumTypes.SessionDelete,
   ) => {
     this.client.events.emit("session_delete", event);
     await this.disconnectPairings();
@@ -218,8 +218,8 @@ export class Engine extends ISingleEthereumEngine {
     if (pairings.length) {
       await Promise.all(
         pairings.map((pairing) =>
-          this.signClient.core.pairing.disconnect({ topic: pairing.topic })
-        )
+          this.signClient.core.pairing.disconnect({ topic: pairing.topic }),
+        ),
       );
     }
   };

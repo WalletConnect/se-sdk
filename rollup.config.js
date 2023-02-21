@@ -59,4 +59,4 @@ function createConfig(
 export default createConfig(
   name,
   dependencies,
-)
+);

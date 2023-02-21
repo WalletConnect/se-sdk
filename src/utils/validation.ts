@@ -6,11 +6,11 @@ export const validateProposalNamespaces = (proposal: ProposalTypes.Struct) => {
   if (
     // if the proposal contains non EVM namespaces
     Object.keys(proposal.requiredNamespaces).some(
-      (key) => key !== EVM_IDENTIFIER
+      (key) => key !== EVM_IDENTIFIER,
     )
   ) {
     throw new Error(
-      "Invalid Session Proposal. Proposal contains non-EVM (`eip155`) namespaces."
+      "Invalid Session Proposal. Proposal contains non-EVM (`eip155`) namespaces.",
     );
   }
 };
@@ -26,25 +26,25 @@ export const validateProposalChains = (proposal: ProposalTypes.Struct) => {
     eip155Chains.length > 1
   ) {
     throw new Error(
-      "Invalid Session Chains. Proposed either no `eip155` chains or more than one."
+      "Invalid Session Chains. Proposed either no `eip155` chains or more than one.",
     );
   }
 };
 
 export const chainAlreadyInSession = (
   session: SessionTypes.Struct,
-  chainId: number
+  chainId: number,
 ) => {
   return session.namespaces?.[EVM_IDENTIFIER]?.chains?.includes(
-    prefixChainWithNamespace(chainId)
+    prefixChainWithNamespace(chainId),
   );
 };
 
 export const accountsAlreadyInSession = (
   session: SessionTypes.Struct,
-  accounts: string[]
+  accounts: string[],
 ) => {
   return accounts.some((account) =>
-    session.namespaces?.[EVM_IDENTIFIER]?.accounts?.includes(account)
+    session.namespaces?.[EVM_IDENTIFIER]?.accounts?.includes(account),
   );
 };

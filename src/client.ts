@@ -43,7 +43,7 @@ export class SingleEthereum extends ISingleEthereum {
 
   public removeListener: ISingleEthereum["removeListener"] = (
     name,
-    listener
+    listener,
   ) => {
     return this.events.removeListener(name, listener);
   };
@@ -105,7 +105,7 @@ export class SingleEthereum extends ISingleEthereum {
   };
 
   public disconnectSession: ISingleEthereum["disconnectSession"] = async (
-    params
+    params,
   ) => {
     try {
       return await this.engine.disconnectSession(params);
@@ -147,12 +147,12 @@ export class SingleEthereum extends ISingleEthereum {
   // ---------- Private ----------------------------------------------- //
 
   private async initialize() {
-    this.logger.trace(`Initialized`);
+    this.logger.trace("Initialized");
     try {
       await this.engine.init();
-      this.logger.info(`SingleEthereum Initialization Success`);
+      this.logger.info("SingleEthereum Initialization Success");
     } catch (error: any) {
-      this.logger.info(`SingleEthereum Initialization Failure`);
+      this.logger.info("SingleEthereum Initialization Failure");
       this.logger.error(error.message);
       throw error;
     }

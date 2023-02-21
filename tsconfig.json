@@ -32,10 +32,10 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "rootDir": "src",
-    "outDir": "./dist/types",
-    "emitDeclarationOnly": true
+    "suppressImplicitAnyIndexErrors": true
   },
-  "include": ["./src/**/*"],
+  "include": ["**/package.json", "src"],
+  "rootDir": "src",
+  "outDir": "./dist/types",
+  "emitDeclarationOnly": true
 }
