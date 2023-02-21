@@ -56,7 +56,6 @@ const Home: NextPage = () => {
     client,
     session,
     disconnect,
-    chain,
     accounts,
     balances,
     chainData,
@@ -64,10 +63,17 @@ const Home: NextPage = () => {
     isInitializing,
     connect,
     web3Provider,
+    activeAccount,
+    activeChainId,
   } = useWalletConnectClient();
 
-  const verifyEip155MessageSignature = (message: string, signature: string, address: string) =>
-    utils.verifyMessage(message, signature).toLowerCase() === address.toLowerCase();
+  const verifyEip155MessageSignature = (
+    message: string,
+    signature: string,
+    address: string
+  ) =>
+    utils.verifyMessage(message, signature).toLowerCase() ===
+    address.toLowerCase();
 
   const ping = async () => {
     if (typeof client === "undefined") {
@@ -99,55 +105,63 @@ const Home: NextPage = () => {
     await ping();
   };
 
-  const testSendTransaction: () => Promise<IFormattedRpcResponse> = async () => {
-    if (!web3Provider) {
-      throw new Error("web3Provider not connected");
-    }
+  const testSendTransaction: () => Promise<IFormattedRpcResponse> =
+    async () => {
+      if (!web3Provider) {
+        throw new Error("web3Provider not connected");
+      }
 
-    const { chainId } = await web3Provider.getNetwork();
-    const [address] = await web3Provider.listAccounts();
-    const balance = await web3Provider.getBalance(address);
+      const { chainId } = await web3Provider.getNetwork();
+      const address = activeAccount;
+      const balance = await web3Provider.getBalance(address);
 
-    const tx = await formatTestTransaction("eip155:" + chainId + ":" + address);
+      const tx = await formatTestTransaction(
+        "eip155:" + chainId + ":" + address
+      );
 
-    if (balance.lt(BigNumber.from(tx.gasPrice).mul(tx.gasLimit))) {
+      if (balance.lt(BigNumber.from(tx.gasPrice).mul(tx.gasLimit))) {
+        return {
+          method: "eth_sendTransaction",
+          address,
+          valid: false,
+          result: "Insufficient funds for intrinsic transaction cost",
+        };
+      }
+
+      const txHash = await web3Provider.send("eth_sendTransaction", [tx]);
+
       return {
         method: "eth_sendTransaction",
         address,
-        valid: false,
-        result: "Insufficient funds for intrinsic transaction cost",
+        valid: true,
+        result: txHash,
       };
-    }
-
-    const txHash = await web3Provider.send("eth_sendTransaction", [tx]);
-
-    return {
-      method: "eth_sendTransaction",
-      address,
-      valid: true,
-      result: txHash,
     };
-  };
 
-  const testSignTransaction: () => Promise<IFormattedRpcResponse> = async () => {
-    if (!web3Provider) {
-      throw new Error("web3Provider not connected");
-    }
+  const testSignTransaction: () => Promise<IFormattedRpcResponse> =
+    async () => {
+      if (!web3Provider) {
+        throw new Error("web3Provider not connected");
+      }
 
-    const { chainId } = await web3Provider.getNetwork();
-    const [address] = await web3Provider.listAccounts();
+      const { chainId } = await web3Provider.getNetwork();
+      const address = activeAccount;
 
-    const tx = await formatTestTransaction("eip155:" + chainId + ":" + address);
-    const signedTx = await web3Provider.send("eth_signTransaction", [tx]);
-    const valid = Transaction.fromSerializedTx(signedTx as any).verifySignature();
+      const tx = await formatTestTransaction(
+        "eip155:" + chainId + ":" + address
+      );
+      const signedTx = await web3Provider.send("eth_signTransaction", [tx]);
+      const valid = Transaction.fromSerializedTx(
+        signedTx as any
+      ).verifySignature();
 
-    return {
-      method: "eth_signTransaction",
-      address,
-      valid,
-      result: signedTx,
+      return {
+        method: "eth_signTransaction",
+        address,
+        valid,
+        result: signedTx,
+      };
     };
-  };
 
   const testSignMessage: () => Promise<IFormattedRpcResponse> = async () => {
     if (!web3Provider) {
@@ -155,8 +169,11 @@ const Home: NextPage = () => {
     }
     const msg = "hello world";
     const hexMsg = encoding.utf8ToHex(msg, true);
-    const [address] = await web3Provider.listAccounts();
-    const signature = await web3Provider.send("personal_sign", [hexMsg, address]);
+    const address = activeAccount;
+    const signature = await web3Provider.send("personal_sign", [
+      hexMsg,
+      address,
+    ]);
     const valid = verifyEip155MessageSignature(msg, signature, address);
     return {
       method: "personal_sign",
@@ -172,7 +189,7 @@ const Home: NextPage = () => {
     }
     const msg = "hello world";
     const hexMsg = encoding.utf8ToHex(msg, true);
-    const [address] = await web3Provider.listAccounts();
+    const address = activeAccount;
     const signature = await web3Provider.send("eth_sign", [address, hexMsg]);
     const valid = verifyEip155MessageSignature(msg, signature, address);
     return {
@@ -190,7 +207,7 @@ const Home: NextPage = () => {
 
     const message = JSON.stringify(eip712.example);
 
-    const [address] = await web3Provider.listAccounts();
+    const address = activeAccount;
 
     // eth_signTypedData params
     const params = [address, message];
@@ -201,12 +218,19 @@ const Home: NextPage = () => {
     // Separate `EIP712Domain` type from remaining types to verify, otherwise `ethers.utils.verifyTypedData`
     // will throw due to "unused" `EIP712Domain` type.
     // See: https://github.com/ethers-io/ethers.js/issues/687#issuecomment-714069471
-    const { EIP712Domain, ...nonDomainTypes }: Record<string, TypedDataField[]> =
-      eip712.example.types;
+    const {
+      EIP712Domain,
+      ...nonDomainTypes
+    }: Record<string, TypedDataField[]> = eip712.example.types;
 
     const valid =
       utils
-        .verifyTypedData(eip712.example.domain, nonDomainTypes, eip712.example.message, signature)
+        .verifyTypedData(
+          eip712.example.domain,
+          nonDomainTypes,
+          eip712.example.message,
+          signature
+        )
         .toLowerCase() === address.toLowerCase();
     return {
       method: "eth_signTypedData",
@@ -217,26 +241,36 @@ const Home: NextPage = () => {
   };
 
   const getEthereumActions = (): AccountAction[] => {
-    const wrapRpcRequest = (rpcRequest: () => Promise<IFormattedRpcResponse>) => async () => {
-      openRequestModal();
-      try {
-        setIsRpcRequestPending(true);
-        const result = await rpcRequest();
-        setRpcResult(result);
-      } catch (error) {
-        console.error("RPC request failed:", error);
-        setRpcResult(null);
-      } finally {
-        setIsRpcRequestPending(false);
-      }
-    };
+    const wrapRpcRequest =
+      (rpcRequest: () => Promise<IFormattedRpcResponse>) => async () => {
+        openRequestModal();
+        try {
+          setIsRpcRequestPending(true);
+          const result = await rpcRequest();
+          setRpcResult(result);
+        } catch (error) {
+          console.error("RPC request failed:", error);
+          setRpcResult(null);
+        } finally {
+          setIsRpcRequestPending(false);
+        }
+      };
 
     return [
-      { method: "eth_sendTransaction", callback: wrapRpcRequest(testSendTransaction) },
-      { method: "eth_signTransaction", callback: wrapRpcRequest(testSignTransaction) },
+      {
+        method: "eth_sendTransaction",
+        callback: wrapRpcRequest(testSendTransaction),
+      },
+      {
+        method: "eth_signTransaction",
+        callback: wrapRpcRequest(testSignTransaction),
+      },
       { method: "personal_sign", callback: wrapRpcRequest(testSignMessage) },
       { method: "eth_sign (standard)", callback: wrapRpcRequest(testEthSign) },
-      { method: "eth_signTypedData", callback: wrapRpcRequest(testSignTypedData) },
+      {
+        method: "eth_signTypedData",
+        callback: wrapRpcRequest(testSignTypedData),
+      },
     ];
   };
 
@@ -263,14 +297,15 @@ const Home: NextPage = () => {
   const renderModal = () => {
     switch (modal) {
       case "request":
-        return <RequestModal pending={isRpcRequestPending} result={rpcResult} />;
+        return (
+          <RequestModal pending={isRpcRequestPending} result={rpcResult} />
+        );
       case "ping":
         return <PingModal pending={isRpcRequestPending} result={rpcResult} />;
       default:
         return null;
     }
   };
-
   const renderContent = () => {
     const chainOptions = isTestnet ? DEFAULT_TEST_CHAINS : DEFAULT_MAIN_CHAINS;
     return !accounts.length && !Object.keys(balances).length ? (
@@ -285,8 +320,13 @@ const Home: NextPage = () => {
             <p>Testnets Only?</p>
             <Toggle active={isTestnet} onClick={toggleTestnets} />
           </SToggleContainer>
-          {chainOptions.map(chainId => (
-            <Blockchain key={chainId} chainId={chainId} chainData={chainData} onClick={connect} />
+          {chainOptions.map((chainId) => (
+            <Blockchain
+              key={chainId}
+              chainId={chainId}
+              chainData={chainData}
+              onClick={connect}
+            />
           ))}
         </SButtonContainer>
       </SLanding>
@@ -294,20 +334,16 @@ const Home: NextPage = () => {
       <SAccountsContainer>
         <h3>Account</h3>
         <SAccounts>
-          {accounts.map(account => {
-            return (
-              <Blockchain
-                key={account}
-                active={true}
-                chainData={chainData}
-                fetching={isFetchingBalances}
-                address={account}
-                chainId={chain}
-                balances={balances}
-                actions={getBlockchainActions(chain)}
-              />
-            );
-          })}
+          <Blockchain
+            key={activeAccount}
+            active={true}
+            chainData={chainData}
+            fetching={isFetchingBalances}
+            address={activeAccount}
+            chainId={`eip155:${activeChainId}`}
+            balances={balances}
+            actions={getBlockchainActions(`eip155:${activeChainId}`)}
+          />
         </SAccounts>
       </SAccountsContainer>
     );

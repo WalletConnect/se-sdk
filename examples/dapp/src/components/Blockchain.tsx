@@ -28,7 +28,7 @@ const SAccount = styled.div<AccountStyleProps>`
   align-items: flex-start;
   border-radius: 8px;
   padding: 8px;
-  margin: 5px 0;
+  margin: auto;
   border: ${({ rgb }) => `2px solid rgb(${rgb})`};
   &.active {
     box-shadow: ${({ rgb }) => `0 0 8px rgb(${rgb})`};
@@ -99,7 +99,7 @@ interface BlockchainDisplayData {
 
 function getBlockchainDisplayData(
   chainId: string,
-  chainData: ChainNamespaces,
+  chainData: ChainNamespaces
 ): BlockchainDisplayData | undefined {
   const [namespace, reference] = chainId.split(":");
   let meta: ChainMetadata;
@@ -114,9 +114,18 @@ function getBlockchainDisplayData(
 }
 
 const Blockchain: FC<PropsWithChildren<BlockchainProps>> = (
-  props: PropsWithChildren<BlockchainProps>,
+  props: PropsWithChildren<BlockchainProps>
 ) => {
-  const { chainData, fetching, chainId, address, onClick, balances, active, actions } = props;
+  const {
+    chainData,
+    fetching,
+    chainId,
+    address,
+    onClick,
+    balances,
+    active,
+    actions,
+  } = props;
 
   if (!Object.keys(chainData).length) return null;
 
@@ -135,7 +144,9 @@ const Blockchain: FC<PropsWithChildren<BlockchainProps>> = (
       >
         <SChain>
           <img src={chain.meta.logo} alt={name} />
-          <p>{name}</p>
+          <p>
+            {name} ({chainId})
+          </p>
         </SChain>
         {!!address && <p>{ellipseAddress(address)}</p>}
         <SBlockchainChildrenContainer>
@@ -151,14 +162,17 @@ const Blockchain: FC<PropsWithChildren<BlockchainProps>> = (
                 <SFullWidthContainer>
                   <h6>Balances</h6>
                   <Column center>
-                    <Asset key={balances[address].symbol} asset={balances[address]} />
+                    <Asset
+                      key={balances[address].symbol}
+                      asset={balances[address]}
+                    />
                   </Column>
                 </SFullWidthContainer>
               ) : null}
               {!!actions && actions.length ? (
                 <SFullWidthContainer>
                   <h6>Methods</h6>
-                  {actions.map(action => (
+                  {actions.map((action) => (
                     <SAction
                       key={action.method}
                       left
