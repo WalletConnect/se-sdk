@@ -17,6 +17,7 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": false
   },
+  "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "editor.wordWrapColumn": 90,
   "eslint.validate": [

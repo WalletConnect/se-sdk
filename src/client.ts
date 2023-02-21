@@ -41,10 +41,7 @@ export class SingleEthereum extends ISingleEthereum {
     return this.events.off(name, listener);
   };
 
-  public removeListener: ISingleEthereum["removeListener"] = (
-    name,
-    listener,
-  ) => {
+  public removeListener: ISingleEthereum["removeListener"] = (name, listener) => {
     return this.events.removeListener(name, listener);
   };
 
@@ -104,9 +101,7 @@ export class SingleEthereum extends ISingleEthereum {
     }
   };
 
-  public disconnectSession: ISingleEthereum["disconnectSession"] = async (
-    params,
-  ) => {
+  public disconnectSession: ISingleEthereum["disconnectSession"] = async (params) => {
     try {
       return await this.engine.disconnectSession(params);
     } catch (error: any) {
@@ -124,25 +119,23 @@ export class SingleEthereum extends ISingleEthereum {
     }
   };
 
-  public getPendingSessionProposals: ISingleEthereum["getPendingSessionProposals"] =
-    () => {
-      try {
-        return this.engine.getPendingSessionProposals();
-      } catch (error: any) {
-        this.logger.error(error.message);
-        throw error;
-      }
-    };
+  public getPendingSessionProposals: ISingleEthereum["getPendingSessionProposals"] = () => {
+    try {
+      return this.engine.getPendingSessionProposals();
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
 
-  public getPendingSessionRequests: ISingleEthereum["getPendingSessionRequests"] =
-    () => {
-      try {
-        return this.engine.getPendingSessionRequests();
-      } catch (error: any) {
-        this.logger.error(error.message);
-        throw error;
-      }
-    };
+  public getPendingSessionRequests: ISingleEthereum["getPendingSessionRequests"] = () => {
+    try {
+      return this.engine.getPendingSessionRequests();
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
 
   // ---------- Private ----------------------------------------------- //
 

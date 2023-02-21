@@ -1,7 +1,4 @@
-import {
-  formatJsonRpcError,
-  formatJsonRpcResult,
-} from "@walletconnect/jsonrpc-utils";
+import { formatJsonRpcError, formatJsonRpcResult } from "@walletconnect/jsonrpc-utils";
 import { SignClient } from "@walletconnect/sign-client";
 import { ISignClient } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
@@ -43,9 +40,7 @@ export class Engine extends ISingleEthereumEngine {
     await this.client.core.pairing.pair(params);
   };
 
-  public approveSession: ISingleEthereumEngine["approveSession"] = async (
-    params,
-  ) => {
+  public approveSession: ISingleEthereumEngine["approveSession"] = async (params) => {
     const { id, chainId, accounts } = params;
     const proposal = this.signClient.proposal.get(id);
     const approveParams = {
@@ -59,9 +54,7 @@ export class Engine extends ISingleEthereumEngine {
       },
     };
 
-    const { topic, acknowledged } = await this.signClient.approve(
-      approveParams,
-    );
+    const { topic, acknowledged } = await this.signClient.approve(approveParams);
     await acknowledged();
 
     this.chainId = chainId;
@@ -69,18 +62,14 @@ export class Engine extends ISingleEthereumEngine {
     return this.signClient.session.get(topic);
   };
 
-  public rejectSession: ISingleEthereumEngine["rejectSession"] = async (
-    params,
-  ) => {
+  public rejectSession: ISingleEthereumEngine["rejectSession"] = async (params) => {
     return await this.signClient.reject({
       id: params.id,
       reason: params.error,
     });
   };
 
-  public updateSession: ISingleEthereumEngine["updateSession"] = async (
-    params,
-  ) => {
+  public updateSession: ISingleEthereumEngine["updateSession"] = async (params) => {
     const { topic, chainId, accounts } = params;
     const session = this.signClient.session.get(topic);
     const formattedChain = prefixChainWithNamespace(chainId);
@@ -124,9 +113,7 @@ export class Engine extends ISingleEthereumEngine {
     });
   };
 
-  public approveRequest: ISingleEthereumEngine["approveRequest"] = async (
-    params,
-  ) => {
+  public approveRequest: ISingleEthereumEngine["approveRequest"] = async (params) => {
     const { topic, id, result } = params;
 
     const response = result.jsonrpc ? result : formatJsonRpcResult(id, result);
@@ -136,9 +123,7 @@ export class Engine extends ISingleEthereumEngine {
     });
   };
 
-  public rejectRequest: ISingleEthereumEngine["rejectRequest"] = async (
-    params,
-  ) => {
+  public rejectRequest: ISingleEthereumEngine["rejectRequest"] = async (params) => {
     const { topic, id, error } = params;
     return await this.signClient.respond({
       topic,
@@ -146,9 +131,7 @@ export class Engine extends ISingleEthereumEngine {
     });
   };
 
-  public disconnectSession: ISingleEthereumEngine["disconnectSession"] = async (
-    params,
-  ) => {
+  public disconnectSession: ISingleEthereumEngine["disconnectSession"] = async (params) => {
     await this.signClient.disconnect({
       topic: params.topic,
       reason: params.error,
@@ -159,11 +142,11 @@ export class Engine extends ISingleEthereumEngine {
   public getActiveSessions: ISingleEthereumEngine["getActiveSessions"] = () =>
     parseSessions(this.signClient.session.getAll());
 
-  public getPendingSessionProposals: ISingleEthereumEngine["getPendingSessionProposals"] =
-    () => parseProposals(this.signClient.proposal.getAll());
+  public getPendingSessionProposals: ISingleEthereumEngine["getPendingSessionProposals"] = () =>
+    parseProposals(this.signClient.proposal.getAll());
 
-  public getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"] =
-    () => this.signClient.getPendingSessionRequests();
+  public getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"] = () =>
+    this.signClient.getPendingSessionRequests();
 
   // ---------- Private ----------------------------------------------- //
 
@@ -200,9 +183,7 @@ export class Engine extends ISingleEthereumEngine {
     });
   };
 
-  private onSessionDelete = async (
-    event: SingleEthereumTypes.SessionDelete,
-  ) => {
+  private onSessionDelete = async (event: SingleEthereumTypes.SessionDelete) => {
     this.client.events.emit("session_delete", event);
     await this.disconnectPairings();
   };

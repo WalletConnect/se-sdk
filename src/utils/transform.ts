@@ -44,8 +44,7 @@ export const parseSessions = (sessions: SessionTypes.Struct[]) => {
 export const parseProposal = (proposal: ProposalTypes.Struct) => {
   const parsedProposal = cloneObject(proposal);
   const chains = proposal.requiredNamespaces[EVM_IDENTIFIER].chains || [];
-  parsedProposal.requiredNamespaces[EVM_IDENTIFIER].chains =
-    parseChains(chains);
+  parsedProposal.requiredNamespaces[EVM_IDENTIFIER].chains = parseChains(chains);
   return parsedProposal;
 };
 

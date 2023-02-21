@@ -43,27 +43,27 @@ export abstract class ISingleEthereumEvents extends EventEmmiter {
 
   public abstract emit: <E extends SingleEthereumTypes.Event>(
     event: E,
-    args: SingleEthereumTypes.EventArguments[E]
+    args: SingleEthereumTypes.EventArguments[E],
   ) => boolean;
 
   public abstract on: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 
   public abstract once: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 
   public abstract off: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 
   public abstract removeListener: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 }
 
@@ -95,21 +95,21 @@ export abstract class ISingleEthereum {
   // ---------- Event Handlers ----------------------------------------------- //
   public abstract on: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 
   public abstract once: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 
   public abstract off: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 
   public abstract removeListener: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 }
