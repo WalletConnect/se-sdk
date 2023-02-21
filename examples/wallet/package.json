@@ -5,7 +5,7 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint  -c .eslintrc.json",
+    "lint": "next lint  -c ./../../.eslintrc",
     "prettier:write": "prettier --write '**/*.{js,ts,jsx,tsx}'"
   },
   "dependencies": {

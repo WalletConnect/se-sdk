@@ -28,10 +28,11 @@ export default function HomePage() {
             chainId={chainId}
             address={eip155Address}
           />
-        )
+        ),
       )}
 
-      {testNets ? (
+      {testNets
+? (
         <Fragment>
           <Text h4 css={{ marginBottom: "$5" }}>
             Testnets
@@ -47,10 +48,11 @@ export default function HomePage() {
                 chainId={chainId}
                 address={eip155Address}
               />
-            )
+            ),
           )}
         </Fragment>
-      ) : null}
+      )
+: null}
     </Fragment>
   );
 }

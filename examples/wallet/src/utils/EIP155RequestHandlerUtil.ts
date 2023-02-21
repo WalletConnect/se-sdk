@@ -15,7 +15,7 @@ import { getSdkError } from "@walletconnect/utils";
 import { providers } from "ethers";
 
 export async function approveEIP155Request(
-  requestEvent: SignClientTypes.EventArguments["session_request"]
+  requestEvent: SignClientTypes.EventArguments["session_request"],
 ) {
   const { params, id } = requestEvent;
   const { chainId, request } = params;
@@ -44,7 +44,7 @@ export async function approveEIP155Request(
 
     case EIP155_SIGNING_METHODS.ETH_SEND_TRANSACTION:
       const provider = new providers.JsonRpcProvider(
-        EIP155_CHAINS[chainId as TEIP155Chain].rpc
+        EIP155_CHAINS[chainId as TEIP155Chain].rpc,
       );
       const sendTransaction = request.params[0];
       const connectedWallet = wallet.connect(provider);
@@ -62,7 +62,7 @@ export async function approveEIP155Request(
 }
 
 export function rejectEIP155Request(
-  request: SignClientTypes.EventArguments["session_request"]
+  request: SignClientTypes.EventArguments["session_request"],
 ) {
   const { id } = request;
 

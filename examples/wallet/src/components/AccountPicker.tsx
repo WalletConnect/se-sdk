@@ -5,7 +5,7 @@ import { web3wallet } from "@/utils/WalletConnectUtil";
 
 export default function AccountPicker() {
   const { account, activeChainId, activeSession } = useSnapshot(
-    SettingsStore.state
+    SettingsStore.state,
   );
 
   function onSelect(value: string) {

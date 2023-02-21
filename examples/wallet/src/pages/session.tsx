@@ -68,7 +68,7 @@ export default function SessionPage() {
 
   async function onSessionUpdate() {
     setLoading(true);
-    await web3wallet.updateSession({ topic, namespaces: newNs });
+    // await web3wallet.updateSession({ topic, namespaces: newNs });
     setUpdated(new Date());
     setLoading(false);
   }
@@ -108,7 +108,7 @@ export default function SessionPage() {
             rgb={rgb}
             address={eip155Address}
           />
-        )
+        ),
       )}
 
       <Row justify="space-between">

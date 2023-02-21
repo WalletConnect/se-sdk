@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import ProjectInfoCard from "@/components/ProjectInfoCard";
 import ProposalSelectSection from "@/components/ProposalSelectSection";
 import RequestModalContainer from "@/components/RequestModalContainer";
@@ -20,9 +21,7 @@ export default function SessionProposalModal() {
 
   // Get proposal data and wallet address from store
   const proposal = ModalStore.state.data?.proposal;
-  useEffect(() => {
-    console.log("selectedAccounts", selectedAccounts);
-  }, [selectedAccounts]);
+
   console.log("proposal", proposal);
   // Ensure proposal is defined
   if (!proposal) {
@@ -44,7 +43,7 @@ export default function SessionProposalModal() {
     params,
     requiredNamespaces,
     optionalNamespaces,
-    sessionProperties
+    sessionProperties,
   );
   const requiredNamespaceKeys = requiredNamespaces
     ? Object.keys(requiredNamespaces)
@@ -58,7 +57,7 @@ export default function SessionProposalModal() {
   function onSelectAccount(chain: string, account: string) {
     if (selectedAccounts[chain]?.includes(account)) {
       const newSelectedAccounts = selectedAccounts[chain]?.filter(
-        (a) => a !== account
+        (a) => a !== account,
       );
       setSelectedAccounts((prev) => ({
         ...prev,
@@ -80,7 +79,7 @@ export default function SessionProposalModal() {
       requiredNamespaceKeys.forEach((key) => {
         if (requiredNamespaces[key].chains) {
           requiredNamespaces[key].chains?.map((chain) =>
-            selectedAccounts[`required:${key}`].map((acc) => accounts.push(acc))
+            selectedAccounts[`required:${key}`].map((acc) => accounts.push(acc)),
           );
         }
       });
@@ -89,7 +88,7 @@ export default function SessionProposalModal() {
 
       const session = await web3wallet.approveSession({
         id,
-        chainId,
+        chainId: parseInt(chainId || "1"),
         accounts,
       });
 
@@ -130,9 +129,11 @@ export default function SessionProposalModal() {
 
         <Divider y={2} />
 
-        {requiredNamespaceKeys.length ? (
+        {requiredNamespaceKeys.length
+? (
           <Text h4>Required Namespaces</Text>
-        ) : null}
+        )
+: null}
         {requiredNamespaceKeys.map((chain) => {
           return (
             <Fragment key={chain}>

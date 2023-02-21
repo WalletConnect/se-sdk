@@ -18,20 +18,28 @@ export default function SettingsPage() {
         Packages
       </Text>
       <Row justify="space-between" align="center">
-        <Text color="$gray400">@walletconnect/web3wallet</Text>
-        <Text color="$gray400">{packageJSON.dependencies["@walletconnect/web3wallet"]}</Text>
+        <Text color="$gray400">@walletconnect/se-sdk</Text>
+        <Text color="$gray400">
+          {packageJSON.dependencies["@walletconnect/se-sdk"]}
+        </Text>
       </Row>
       <Row justify="space-between" align="center">
         <Text color="$gray400">@walletconnect/core</Text>
-        <Text color="$gray400">{packageJSON.dependencies["@walletconnect/core"]}</Text>
+        <Text color="$gray400">
+          {packageJSON.dependencies["@walletconnect/core"]}
+        </Text>
       </Row>
       <Row justify="space-between" align="center">
         <Text color="$gray400">@walletconnect/utils</Text>
-        <Text color="$gray400">{packageJSON.dependencies["@walletconnect/utils"]}</Text>
+        <Text color="$gray400">
+          {packageJSON.dependencies["@walletconnect/utils"]}
+        </Text>
       </Row>
       <Row justify="space-between" align="center">
         <Text color="$gray400">@walletconnect/types</Text>
-        <Text color="$gray400">{packageJSON.devDependencies["@walletconnect/types"]}</Text>
+        <Text color="$gray400">
+          {packageJSON.devDependencies["@walletconnect/types"]}
+        </Text>
       </Row>
 
       <Divider y={2} />
@@ -55,16 +63,25 @@ export default function SettingsPage() {
 
       <Divider y={2} />
 
-      <Text css={{ color: "$yellow500", marginBottom: "$5", textAlign: "left", padding: 0 }}>
-        Warning: mnemonics and secret keys are provided for development purposes only and should not
-        be used elsewhere!
+      <Text
+        css={{
+          color: "$yellow500",
+          marginBottom: "$5",
+          textAlign: "left",
+          padding: 0,
+        }}
+      >
+        Warning: mnemonics and secret keys are provided for development purposes
+        only and should not be used elsewhere!
       </Text>
 
       <Text h4 css={{ marginTop: "$5", marginBottom: "$5" }}>
         EIP155 Mnemonic
       </Text>
       <Card variant="bordered" css={{ minHeight: "100px", padding: 10 }}>
-        <Text css={{ fontFamily: "$mono" }}>{eip155Wallets[eip155Address].getMnemonic()}</Text>
+        <Text css={{ fontFamily: "$mono" }}>
+          {eip155Wallets[eip155Address].getMnemonic()}
+        </Text>
       </Card>
     </Fragment>
   );

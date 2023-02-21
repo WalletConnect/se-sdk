@@ -1,6 +1,5 @@
 import SettingsStore from "@/store/SettingsStore";
 import { Core } from "@walletconnect/core";
-import { Web3Wallet } from "@walletconnect/web3wallet";
 import { SingleEthereum } from "@walletconnect/se-sdk";
 import { EIP155_MAINNET_CHAINS } from "@/data/EIP155Data";
 
@@ -29,7 +28,6 @@ export async function createWeb3Wallet() {
     SettingsStore.setActiveChainId(EIP155_MAINNET_CHAINS["eip155:1"].chainId);
     const sessions = web3wallet.getActiveSessions();
     if (sessions) {
-      console.log(Object.keys(sessions)[0]);
       SettingsStore.setActiveSession(Object.keys(sessions)[0]);
     }
   }

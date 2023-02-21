@@ -25,7 +25,7 @@ export default function AccountCard({
 }: Props) {
   const [copied, setCopied] = useState(false);
   const { activeChainId, account, activeSession } = useSnapshot(
-    SettingsStore.state
+    SettingsStore.state,
   );
 
   function onCopy() {
@@ -82,7 +82,7 @@ export default function AccountCard({
           onChainChanged(chainId);
         }}
       >
-        {activeChainId == chainId ? `✅` : `🔄`}
+        {activeChainId === chainId ? `✅` : `🔄`}
       </Button>
     </ChainCard>
   );
