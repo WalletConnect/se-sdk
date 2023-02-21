@@ -73,8 +73,8 @@ export function ClientContextProvider({
   const [accounts, setAccounts] = useState<string[]>([]);
   const [chainData, setChainData] = useState<ChainNamespaces>({});
   const [chain, setChain] = useState<string>("");
-  const [activeChainId, setActiveChainId] = useState<number>();
-  const [activeAccount, setActiveAccount] = useState<string>();
+  const [activeChainId, setActiveChainId] = useState<number>(1);
+  const [activeAccount, setActiveAccount] = useState<string>("");
 
   const resetApp = () => {
     setPairings([]);
