@@ -16,47 +16,41 @@ const plugins = [
   }),
 ];
 
-function createConfig(
-    packageName,
-    packageDependencies,
-  ) {
-    return [
-      {
-        input,
-        plugins,
-        output: {
-          file: "./dist/index.umd.js",
-          format: "umd",
+function createConfig(packageName, packageDependencies) {
+  return [
+    {
+      input,
+      plugins,
+      output: {
+        file: "./dist/index.umd.js",
+        format: "umd",
+        exports: "named",
+        name: packageName,
+        sourcemap: true,
+      },
+    },
+    {
+      input,
+      plugins,
+      external: packageDependencies,
+      output: [
+        {
+          file: "./dist/index.cjs.js",
+          format: "cjs",
           exports: "named",
           name: packageName,
           sourcemap: true,
         },
-      },
-      {
-        input,
-        plugins,
-        external: packageDependencies,
-        output: [
-          {
-            file: "./dist/index.cjs.js",
-            format: "cjs",
-            exports: "named",
-            name: packageName,
-            sourcemap: true,
-          },
-          {
-            file: "./dist/index.es.js",
-            format: "es",
-            exports: "named",
-            name: packageName,
-            sourcemap: true,
-          },
-        ],
-      },
-    ];
-  }
+        {
+          file: "./dist/index.es.js",
+          format: "es",
+          exports: "named",
+          name: packageName,
+          sourcemap: true,
+        },
+      ],
+    },
+  ];
+}
 
-export default createConfig(
-  name,
-  dependencies,
-);
+export default createConfig(name, dependencies);
