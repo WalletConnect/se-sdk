@@ -17,6 +17,7 @@ import {
   parseSessions,
   parseProposals,
   parseProposal,
+  accountsAlreadyInSession,
 } from "../utils";
 
 export class Engine extends ISingleEthereumEngine {
@@ -84,19 +85,22 @@ export class Engine extends ISingleEthereumEngine {
     const session = this.signClient.session.get(topic);
     const formattedChain = prefixChainWithNamespace(chainId);
     const formattedAccounts = formatAccounts(accounts, chainId);
+    const namespaces = session.namespaces[EVM_IDENTIFIER];
     if (!chainAlreadyInSession(session, chainId)) {
-      const namespaces = session.namespaces[EVM_IDENTIFIER];
       namespaces?.chains?.push(formattedChain);
-      namespaces.accounts = namespaces.accounts.concat(formattedAccounts);
-
-      const { acknowledged } = await this.signClient.update({
-        topic,
-        namespaces: {
-          [EVM_IDENTIFIER]: namespaces,
-        },
-      });
-      await acknowledged();
     }
+
+    if (!accountsAlreadyInSession(session, formattedAccounts)) {
+      namespaces.accounts = namespaces.accounts.concat(formattedAccounts);
+    }
+
+    const { acknowledged } = await this.signClient.update({
+      topic,
+      namespaces: {
+        [EVM_IDENTIFIER]: namespaces,
+      },
+    });
+    await acknowledged();
 
     if (this.chainId !== chainId) {
       await this.signClient.emit({

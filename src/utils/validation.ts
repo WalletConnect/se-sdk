@@ -39,3 +39,12 @@ export const chainAlreadyInSession = (
     prefixChainWithNamespace(chainId)
   );
 };
+
+export const accountsAlreadyInSession = (
+  session: SessionTypes.Struct,
+  accounts: string[]
+) => {
+  return accounts.some((account) =>
+    session.namespaces?.[EVM_IDENTIFIER]?.accounts?.includes(account)
+  );
+};
