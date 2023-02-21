@@ -12,15 +12,11 @@ import { apiGetChainNamespace, ChainsMap } from "caip-api";
 import { PairingTypes, SessionTypes } from "@walletconnect/types";
 import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import type IEthereumProvider from "@walletconnect/ethereum-provider";
-import Client from "@walletconnect/sign-client";
+import type Client from "@walletconnect/sign-client";
 
 import { DEFAULT_PROJECT_ID } from "../constants";
 import { providers, utils } from "ethers";
-import {
-  AccountBalances,
-  ChainNamespaces,
-  getAllChainNamespaces,
-} from "../helpers";
+import { AccountBalances, ChainNamespaces, getAllChainNamespaces } from "../helpers";
 /**
  * Types
  */
@@ -52,11 +48,7 @@ export const ClientContext = createContext<IContext>({} as IContext);
 /**
  * Provider
  */
-export function ClientContextProvider({
-  children,
-}: {
-  children: ReactNode | ReactNode[];
-}) {
+export function ClientContextProvider({ children }: { children: ReactNode | ReactNode[] }) {
   const [client, setClient] = useState<Client>();
   const [pairings, setPairings] = useState<PairingTypes.Struct[]>([]);
   const [session, setSession] = useState<SessionTypes.Struct>();
@@ -66,8 +58,7 @@ export function ClientContextProvider({
 
   const [isFetchingBalances, setIsFetchingBalances] = useState(false);
   const [isInitializing, setIsInitializing] = useState(false);
-  const [hasCheckedPersistedSession, setHasCheckedPersistedSession] =
-    useState(false);
+  const [hasCheckedPersistedSession, setHasCheckedPersistedSession] = useState(false);
 
   const [balances, setBalances] = useState<AccountBalances>({});
   const [accounts, setAccounts] = useState<string[]>([]);
@@ -98,7 +89,7 @@ export function ClientContextProvider({
         if (typeof chains !== "undefined") {
           chainData[namespace] = chains;
         }
-      })
+      }),
     );
     setChainData(chainData);
   };
@@ -153,7 +144,7 @@ export function ClientContextProvider({
         resetApp();
       });
     },
-    [accounts, web3Provider]
+    [accounts, web3Provider],
   );
 
   const createClient = useCallback(async () => {
@@ -180,13 +171,10 @@ export function ClientContextProvider({
     }
   }, []);
 
-  const createWeb3Provider = useCallback(
-    (ethereumProvider: IEthereumProvider) => {
-      const web3Provider = new providers.Web3Provider(ethereumProvider, "any");
-      setWeb3Provider(web3Provider);
-    },
-    []
-  );
+  const createWeb3Provider = useCallback((ethereumProvider: IEthereumProvider) => {
+    const web3Provider = new providers.Web3Provider(ethereumProvider, "any");
+    setWeb3Provider(web3Provider);
+  }, []);
 
   const connect = useCallback(
     async (caipChainId: string, pairing?: { topic: string }) => {
@@ -212,7 +200,7 @@ export function ClientContextProvider({
       setSession(ethereumProvider.session);
       setChain(caipChainId);
     },
-    [ethereumProvider, createWeb3Provider]
+    [ethereumProvider, createWeb3Provider],
   );
 
   const onSessionConnected = useCallback(
@@ -234,7 +222,7 @@ export function ClientContextProvider({
       console.log("RESTORED", allNamespaceChains, allNamespaceAccounts);
       createWeb3Provider(ethereumProvider);
     },
-    [ethereumProvider, createWeb3Provider]
+    [ethereumProvider, createWeb3Provider],
   );
 
   const _checkForPersistedSession = useCallback(
@@ -257,7 +245,7 @@ export function ClientContextProvider({
         return _session;
       }
     },
-    [session, ethereumProvider, onSessionConnected]
+    [session, ethereumProvider, onSessionConnected],
   );
 
   useEffect(() => {
@@ -289,7 +277,7 @@ export function ClientContextProvider({
               balance: utils.formatEther(balance),
               contractAddress: "",
             };
-          })
+          }),
         );
 
         const balancesByAccount = _balances.reduce((obj, balance) => {
@@ -318,12 +306,7 @@ export function ClientContextProvider({
     if (ethereumProvider && chainData && !hasCheckedPersistedSession) {
       getPersistedSession();
     }
-  }, [
-    ethereumProvider,
-    chainData,
-    _checkForPersistedSession,
-    hasCheckedPersistedSession,
-  ]);
+  }, [ethereumProvider, chainData, _checkForPersistedSession, hasCheckedPersistedSession]);
 
   const value = useMemo(
     () => ({
@@ -357,7 +340,7 @@ export function ClientContextProvider({
       web3Provider,
       activeAccount,
       activeChainId,
-    ]
+    ],
   );
 
   return (
@@ -374,9 +357,7 @@ export function ClientContextProvider({
 export function useWalletConnectClient() {
   const context = useContext(ClientContext);
   if (context === undefined) {
-    throw new Error(
-      "useWalletConnectClient must be used within a ClientContextProvider"
-    );
+    throw new Error("useWalletConnectClient must be used within a ClientContextProvider");
   }
   return context;
 }

@@ -3065,7 +3065,7 @@
   dependencies:
     tslib "1.14.1"
 
-"@walletconnect/ethereum-provider@^2.4.4":
+"@walletconnect/ethereum-provider@^2.4.4-canary-df6ed87b":
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/@walletconnect/ethereum-provider/-/ethereum-provider-2.4.4.tgz#b5c5a92681b6fdb7bb1c43eacaa90cd87c425854"
   integrity sha512-zjJunZLo/9HfP0GBMqxtAs3fqwPym4qkZl6Q7RsEaLvbApHsYZLyHbbog7QV4zB6cB97HUtS18IJIGqtLcpzCg==
@@ -3213,7 +3213,7 @@
   dependencies:
     tslib "1.14.1"
 
-"@walletconnect/types@2.4.4", "@walletconnect/types@^2.4.4":
+"@walletconnect/types@2.4.4", "@walletconnect/types@^2.4.4-canary-df6ed87b":
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/@walletconnect/types/-/types-2.4.4.tgz#f2edb02f70e7dfb0f4265d78b0b745a776eb0dae"
   integrity sha512-4XndBOlB0qbhaJvzcBZCfR69rfU5rV0U5b3YbJ1AmtxcJSJAIg68WDP7o4BE4w1LHzdsEWvbXHRYL+KsA+uG3w==
@@ -3242,7 +3242,7 @@
     events "^3.3.0"
     pino "7.11.0"
 
-"@walletconnect/utils@2.4.4", "@walletconnect/utils@^2.4.4":
+"@walletconnect/utils@2.4.4", "@walletconnect/utils@^2.4.4-canary-df6ed87b":
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/@walletconnect/utils/-/utils-2.4.4.tgz#1ee72172c7fb28f096c600fde19b12b770aa44df"
   integrity sha512-PM4biwrvi5OwXIroLHDxtCOXlvZGCGNvbYS0Jkb6ZmP1EbGjVz1xA1hnp/lC3eGFQArSyvS7EHD6XQQpymZ2jA==
