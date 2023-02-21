@@ -28,7 +28,7 @@ const SAccount = styled.div<AccountStyleProps>`
   align-items: flex-start;
   border-radius: 8px;
   padding: 8px;
-  margin: auto;
+  margin: 5px auto;
   border: ${({ rgb }) => `2px solid rgb(${rgb})`};
   &.active {
     box-shadow: ${({ rgb }) => `0 0 8px rgb(${rgb})`};
