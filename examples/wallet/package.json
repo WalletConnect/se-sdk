@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint  -c ./../../.eslintrc",
     "prettier:write": "prettier --write '**/*.{js,ts,jsx,tsx}'",
-    "install:all": "cd ../../ && yarn && cd ./examples/wallet && yarn"
+    "install:all": "cd ../../ && yarn && yarn build && cd ./examples/wallet && yarn"
   },
   "dependencies": {
     "@json-rpc-tools/utils": "1.7.6",
