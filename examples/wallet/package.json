@@ -3,10 +3,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
+    "pre:build": "cd ../../ && yarn build",
+    "build": "yarn pre:build; next build",
     "start": "next start",
     "lint": "next lint  -c ./../../.eslintrc",
-    "prettier:write": "prettier --write '**/*.{js,ts,jsx,tsx}'"
+    "prettier:write": "prettier --write '**/*.{js,ts,jsx,tsx}'",
+    "install:all": "yarn && cd ../../ && yarn"
   },
   "dependencies": {
     "@json-rpc-tools/utils": "1.7.6",
