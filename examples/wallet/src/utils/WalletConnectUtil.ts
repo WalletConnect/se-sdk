@@ -1,6 +1,6 @@
 import SettingsStore from "@/store/SettingsStore";
 import { Core } from "@walletconnect/core";
-import { SingleEthereum } from "@walletconnect/se-sdk";
+import SingleEthereum from "@walletconnect/se-sdk";
 import { EIP155_MAINNET_CHAINS } from "@/data/EIP155Data";
 
 export let web3wallet: InstanceType<typeof SingleEthereum>;
