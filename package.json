@@ -26,7 +26,11 @@
     "test": "vitest run --dir test --no-threads",
     "lint": "eslint --fix './src/**/*.ts'",
     "prettier": "prettier --check '{src,test}/**/*.{js,ts,jsx,tsx}'",
-    "examples": "cd ./examples/dapp && yarn dev & cd ./examples/wallet && yarn dev"
+    "run:examples": "cd ./examples/dapp && yarn dev & cd ./examples/wallet && yarn dev",
+    "run:dapp": "cd ./examples/dapp && yarn dev",
+    "run:wallet": "cd ./examples/wallet && yarn dev",
+    "build:wallet": "yarn build && cd ./examples/wallet && yarn build",
+    "install:all": "yarn & cd ./examples/dapp && yarn & cd ./examples/wallet && yarn"
   },
   "dependencies": {
     "@walletconnect/core": "^2.4.4",
