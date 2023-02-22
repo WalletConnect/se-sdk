@@ -30,7 +30,7 @@
     "run:dapp": "cd ./examples/dapp && yarn dev",
     "run:wallet": "cd ./examples/wallet && yarn dev",
     "build:wallet": "yarn build && cd ./examples/wallet && yarn build",
-    "install:all": "yarn & cd ./examples/dapp && yarn & cd ./examples/wallet && yarn"
+    "install:all": "yarn && cd ./examples/dapp && yarn && cd ./../wallet && yarn"
   },
   "dependencies": {
     "@walletconnect/core": "^2.4.4",
