@@ -55,3 +55,7 @@ export const parseProposals = (proposals: ProposalTypes.Struct[]) => {
 export const cloneObject = (obj: any) => {
   return JSON.parse(JSON.stringify(obj));
 };
+
+export const formatAuthAddress = (address: string) => {
+  return address.includes("did:pkh") ? address : `did:pkh:eip155:1:${address}`;
+};

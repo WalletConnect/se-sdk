@@ -2,9 +2,10 @@ import EventEmmiter, { EventEmitter } from "events";
 import { CoreTypes, ICore, ProposalTypes } from "@walletconnect/types";
 import { ISingleEthereumEngine } from "./engine";
 import { Logger } from "@walletconnect/logger";
+import { AuthClientTypes, AuthEngineTypes } from "@walletconnect/auth-client";
 
 export declare namespace SingleEthereumTypes {
-  type Event = "session_proposal" | "session_request" | "session_delete";
+  type Event = "session_proposal" | "session_request" | "session_delete" | "auth_request";
 
   interface BaseEventArgs<T = unknown> {
     id: number;
@@ -21,11 +22,17 @@ export declare namespace SingleEthereumTypes {
 
   type SessionDelete = Omit<BaseEventArgs, "params">;
 
+  type AuthRequest = BaseEventArgs<AuthClientTypes.AuthRequestEventArgs>;
+
   interface EventArguments {
     session_proposal: Omit<BaseEventArgs<ProposalTypes.Struct>, "topic">;
     session_request: SessionRequest;
     session_delete: Omit<BaseEventArgs, "params">;
+    auth_request: AuthRequest;
   }
+
+  type CacaoRequestPayload = AuthEngineTypes.CacaoRequestPayload;
+  type PendingAuthRequest = AuthEngineTypes.PendingRequest;
 
   interface Options {
     core: ICore;
@@ -91,6 +98,11 @@ export abstract class ISingleEthereum {
   public abstract getActiveSessions: ISingleEthereumEngine["getActiveSessions"];
   public abstract getPendingSessionProposals: ISingleEthereumEngine["getPendingSessionProposals"];
   public abstract getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"];
+
+  // auth //
+  public abstract formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"];
+  public abstract approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"];
+  public abstract rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"];
 
   // ---------- Event Handlers ----------------------------------------------- //
   public abstract on: <E extends SingleEthereumTypes.Event>(

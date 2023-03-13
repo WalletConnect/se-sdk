@@ -1,14 +1,9 @@
 import { ErrorResponse } from "@walletconnect/jsonrpc-utils";
-import {
-  ISignClient,
-  PendingRequestTypes,
-  ProposalTypes,
-  SessionTypes,
-} from "@walletconnect/types";
-import { ISingleEthereum } from "./client";
-
+import { PendingRequestTypes, ProposalTypes, SessionTypes } from "@walletconnect/types";
+import { IWeb3Wallet } from "@walletconnect/web3wallet";
+import { ISingleEthereum, SingleEthereumTypes } from "./client";
 export abstract class ISingleEthereumEngine {
-  public abstract signClient: ISignClient;
+  public abstract web3wallet: IWeb3Wallet;
 
   constructor(public client: ISingleEthereum) {}
   // ---------- Public Methods ------------------------------------------------- //
@@ -48,11 +43,28 @@ export abstract class ISingleEthereumEngine {
   public abstract disconnectSession(params: { topic: string; error: ErrorResponse }): Promise<void>;
 
   // query all active sessions (SIGN)
-  public abstract getActiveSessions(): Record<string, SessionTypes.Struct>;
+  public abstract getActiveSessions(): Record<string, SessionTypes.Struct> | undefined;
 
   // query all pending session requests (SIGN)
-  public abstract getPendingSessionProposals(): Record<number, ProposalTypes.Struct>;
+  public abstract getPendingSessionProposals(): Record<number, ProposalTypes.Struct> | undefined;
 
   // query all pending session requests (SIGN)
-  public abstract getPendingSessionRequests(): PendingRequestTypes.Struct[];
+  public abstract getPendingSessionRequests(): PendingRequestTypes.Struct[] | undefined;
+
+  // // ---------- Auth ------------------------------------------------- //
+
+  public abstract approveAuthRequest(params: {
+    id: number;
+    signature: string;
+    address: string;
+  }): Promise<void>;
+
+  public abstract formatAuthMessage(
+    payload: SingleEthereumTypes.CacaoRequestPayload,
+    address: string,
+  ): string;
+
+  public abstract rejectAuthRequest(params: { id: number; error: ErrorResponse }): Promise<void>;
+
+  public abstract getPendingAuthRequests(): Record<number, SingleEthereumTypes.PendingAuthRequest>;
 }

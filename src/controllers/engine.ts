@@ -1,7 +1,6 @@
 import { formatJsonRpcError, formatJsonRpcResult } from "@walletconnect/jsonrpc-utils";
-import { SignClient } from "@walletconnect/sign-client";
-import { ISignClient } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
+import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet";
 import { EVM_IDENTIFIER } from "../constants";
 import { ISingleEthereumEngine, SingleEthereumTypes } from "../types";
 import {
@@ -15,24 +14,24 @@ import {
   parseProposals,
   parseProposal,
   accountsAlreadyInSession,
+  formatAuthAddress,
 } from "../utils";
 
 export class Engine extends ISingleEthereumEngine {
-  public signClient: ISignClient;
+  public web3wallet: IWeb3Wallet;
   public chainId?: number;
 
   constructor(client: ISingleEthereumEngine["client"]) {
     super(client);
     // initialized in init()
-    this.signClient = {} as any;
+    this.web3wallet = {} as IWeb3Wallet;
   }
 
   public init = async () => {
-    this.signClient = await SignClient.init({
+    this.web3wallet = await Web3Wallet.init({
       core: this.client.core,
       metadata: this.client.metadata,
     });
-
     this.initializeEventListeners();
   };
 
@@ -42,7 +41,7 @@ export class Engine extends ISingleEthereumEngine {
 
   public approveSession: ISingleEthereumEngine["approveSession"] = async (params) => {
     const { id, chainId, accounts } = params;
-    const proposal = this.signClient.proposal.get(id);
+    const proposal = this.web3wallet.engine.signClient.proposal.get(id);
     const approveParams = {
       id,
       namespaces: {
@@ -54,16 +53,13 @@ export class Engine extends ISingleEthereumEngine {
       },
     };
 
-    const { topic, acknowledged } = await this.signClient.approve(approveParams);
-    await acknowledged();
-
+    const session = await this.web3wallet.approveSession(approveParams);
     this.chainId = chainId;
-
-    return this.signClient.session.get(topic);
+    return session;
   };
 
   public rejectSession: ISingleEthereumEngine["rejectSession"] = async (params) => {
-    return await this.signClient.reject({
+    return await this.web3wallet.rejectSession({
       id: params.id,
       reason: params.error,
     });
@@ -71,7 +67,7 @@ export class Engine extends ISingleEthereumEngine {
 
   public updateSession: ISingleEthereumEngine["updateSession"] = async (params) => {
     const { topic, chainId, accounts } = params;
-    const session = this.signClient.session.get(topic);
+    const session = this.web3wallet.engine.signClient.session.get(topic);
     const formattedChain = prefixChainWithNamespace(chainId);
     const formattedAccounts = formatAccounts(accounts, chainId);
     const namespaces = session.namespaces[EVM_IDENTIFIER];
@@ -83,16 +79,15 @@ export class Engine extends ISingleEthereumEngine {
       namespaces.accounts = namespaces.accounts.concat(formattedAccounts);
     }
 
-    const { acknowledged } = await this.signClient.update({
+    await this.web3wallet.updateSession({
       topic,
       namespaces: {
         [EVM_IDENTIFIER]: namespaces,
       },
     });
-    await acknowledged();
 
     if (this.chainId !== chainId) {
-      await this.signClient.emit({
+      await this.web3wallet.emitSessionEvent({
         topic,
         event: {
           name: "chainChanged",
@@ -103,7 +98,7 @@ export class Engine extends ISingleEthereumEngine {
       this.chainId = chainId;
     }
 
-    await this.signClient.emit({
+    await this.web3wallet.emitSessionEvent({
       topic,
       event: {
         name: "accountsChanged",
@@ -117,7 +112,7 @@ export class Engine extends ISingleEthereumEngine {
     const { topic, id, result } = params;
 
     const response = result.jsonrpc ? result : formatJsonRpcResult(id, result);
-    return await this.signClient.respond({
+    return await this.web3wallet.respondSessionRequest({
       topic,
       response,
     });
@@ -125,28 +120,72 @@ export class Engine extends ISingleEthereumEngine {
 
   public rejectRequest: ISingleEthereumEngine["rejectRequest"] = async (params) => {
     const { topic, id, error } = params;
-    return await this.signClient.respond({
+    return await this.web3wallet.respondSessionRequest({
       topic,
       response: formatJsonRpcError(id, error),
     });
   };
 
   public disconnectSession: ISingleEthereumEngine["disconnectSession"] = async (params) => {
-    await this.signClient.disconnect({
+    await this.web3wallet.disconnectSession({
       topic: params.topic,
       reason: params.error,
     });
     await this.disconnectPairings();
   };
 
-  public getActiveSessions: ISingleEthereumEngine["getActiveSessions"] = () =>
-    parseSessions(this.signClient.session.getAll());
+  public getActiveSessions: ISingleEthereumEngine["getActiveSessions"] = () => {
+    const sessions = this.web3wallet.getActiveSessions();
+    if (!sessions) return undefined;
+    return parseSessions(Object.values(sessions));
+  };
 
-  public getPendingSessionProposals: ISingleEthereumEngine["getPendingSessionProposals"] = () =>
-    parseProposals(this.signClient.proposal.getAll());
+  public getPendingSessionProposals: ISingleEthereumEngine["getPendingSessionProposals"] = () => {
+    const proposals = this.web3wallet.getPendingSessionProposals();
+    if (!proposals) return undefined;
+    return parseProposals(Object.values(proposals));
+  };
 
-  public getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"] = () =>
-    this.signClient.getPendingSessionRequests();
+  public getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"] = () => {
+    const requests = this.web3wallet.getPendingSessionRequests();
+    if (!requests) return undefined;
+    return requests;
+  };
+
+  // ---------- Auth ----------------------------------------------- //
+
+  public approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"] = async (params) => {
+    const { id, signature, address } = params;
+    return await this.web3wallet.respondAuthRequest(
+      {
+        id,
+        signature: {
+          s: signature,
+          t: "eip191",
+        },
+      },
+      formatAuthAddress(address),
+    );
+  };
+
+  public rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"] = async (params) => {
+    const { id, error } = params;
+    return await this.web3wallet.respondAuthRequest(
+      {
+        id,
+        error,
+      },
+      "",
+    );
+  };
+
+  public getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"] = () => {
+    return [];
+  };
+
+  public formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"] = (payload, address) => {
+    return this.web3wallet.formatMessage(payload, formatAuthAddress(address));
+  };
 
   // ---------- Private ----------------------------------------------- //
 
@@ -188,18 +227,23 @@ export class Engine extends ISingleEthereumEngine {
     await this.disconnectPairings();
   };
 
+  private onAuthRequest = (event: SingleEthereumTypes.AuthRequest) => {
+    this.client.events.emit("auth_request", event);
+  };
+
   private initializeEventListeners = () => {
-    this.signClient.events.on("session_proposal", this.onSessionProposal);
-    this.signClient.events.on("session_request", this.onSessionRequest);
-    this.signClient.events.on("session_delete", this.onSessionDelete);
+    this.web3wallet.on("session_proposal", this.onSessionProposal);
+    this.web3wallet.on("session_request", this.onSessionRequest);
+    this.web3wallet.on("session_delete", this.onSessionDelete);
+    this.web3wallet.on("auth_request", this.onAuthRequest);
   };
 
   private disconnectPairings = async () => {
-    const pairings = this.signClient.core.pairing.getPairings();
+    const pairings = this.web3wallet.core.pairing.getPairings();
     if (pairings.length) {
       await Promise.all(
         pairings.map((pairing) =>
-          this.signClient.core.pairing.disconnect({ topic: pairing.topic }),
+          this.web3wallet.core.pairing.disconnect({ topic: pairing.topic }),
         ),
       );
     }

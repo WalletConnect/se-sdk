@@ -137,6 +137,35 @@ export class SingleEthereum extends ISingleEthereum {
     }
   };
 
+  // ---------- Auth ----------------------------------------------- //
+
+  public formatAuthMessage: ISingleEthereum["formatAuthMessage"] = (payload, address) => {
+    try {
+      return this.engine.formatAuthMessage(payload, address);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  public approveAuthRequest: ISingleEthereum["approveAuthRequest"] = (payload) => {
+    try {
+      return this.engine.approveAuthRequest(payload);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  public rejectAuthRequest: ISingleEthereum["rejectAuthRequest"] = (payload) => {
+    try {
+      return this.engine.rejectAuthRequest(payload);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
   // ---------- Private ----------------------------------------------- //
 
   private async initialize() {

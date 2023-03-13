@@ -1,5 +1,6 @@
 import esbuild from "rollup-plugin-esbuild";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
+import nodePolyfills from "rollup-plugin-polyfill-node";
 import commonjs from "@rollup/plugin-commonjs";
 import { name, dependencies } from "./package.json";
 
@@ -7,6 +8,7 @@ const input = "./src/index.ts";
 const plugins = [
   nodeResolve({ preferBuiltins: false, browser: true }),
   commonjs(),
+  nodePolyfills(),
   esbuild({
     minify: false,
     tsconfig: "./tsconfig.json",
@@ -53,4 +55,4 @@ function createConfig(packageName, packageDependencies) {
   ];
 }
 
-export default createConfig(name, dependencies);
+export default createConfig(name, Object.keys(dependencies));
