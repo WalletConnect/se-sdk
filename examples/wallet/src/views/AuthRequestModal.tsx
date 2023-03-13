@@ -18,7 +18,7 @@ import AccountSelectCard from "@/components/AccountSelectCard";
 
 export default function AuthRequestModal() {
   const authRequest = ModalStore.state.data?.authRequest;
-  const { params, id } = authRequest;
+  const id = authRequest?.id || 0;
   const [message, setMessage] = useState<string>();
   const [selectedAdress, setSelectedAddress] = useState<string>(eip155Addresses[0]);
   useEffect(() => {

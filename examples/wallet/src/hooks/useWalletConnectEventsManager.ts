@@ -29,7 +29,7 @@ export default function useWalletConnectEventsManager() {
       console.log("session_request", requestEvent);
       const { topic, params } = requestEvent;
       const { request } = params;
-      const requestSession = web3wallet.getActiveSessions()[topic];
+      const requestSession = web3wallet.getActiveSessions()?.[topic];
       const pendingRequests = web3wallet.getPendingSessionRequests();
       console.log("pendingRequests", pendingRequests);
 

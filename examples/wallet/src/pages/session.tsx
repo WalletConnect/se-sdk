@@ -28,7 +28,7 @@ export default function SessionPage() {
     }
   }, [query]);
 
-  const session = web3wallet.getActiveSessions()[topic];
+  const session = web3wallet.getActiveSessions()?.[topic];
 
   if (!session) {
     return null;

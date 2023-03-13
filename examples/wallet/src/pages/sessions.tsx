@@ -6,7 +6,7 @@ import { Fragment } from "react";
 
 export default function SessionsPage() {
   const sessions = web3wallet.getActiveSessions();
-  const sessionTopics = Object.keys(sessions);
+  const sessionTopics = sessions ? Object.keys(sessions) : [];
 
   if (!sessionTopics.length) {
     return (
@@ -20,7 +20,7 @@ export default function SessionsPage() {
   return (
     <Fragment>
       <PageHeader title="Sessions" />
-      {sessionTopics.length
+      {sessionTopics.length && sessions
         ? sessionTopics.map((topic) => {
             const { name, icons, url } = sessions[topic].peer.metadata;
             return <SessionCard key={topic} topic={topic} name={name} logo={icons[0]} url={url} />;
