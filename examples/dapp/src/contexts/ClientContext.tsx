@@ -182,13 +182,9 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
         throw new ReferenceError("WalletConnect Client is not initialized.");
       }
 
-      const chainId = caipChainId.split(":").pop();
-
-      console.log("Enabling EthereumProvider for chainId: ", chainId);
-
-      const chain = parseInt(chainId?.split(":")[1] || "1");
+      const chainId = (caipChainId.split(":").pop() || 1) as number;
       await ethereumProvider.connect({
-        chains: [chain],
+        chains: [chainId],
       });
 
       createWeb3Provider(ethereumProvider);
@@ -196,7 +192,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
       console.log("_accounts", _accounts);
       setAccounts(_accounts);
       setActiveAccount(_accounts[0]);
-      setActiveChainId(chain);
+      setActiveChainId(chainId);
       setSession(ethereumProvider.session);
       setChain(caipChainId);
     },
