@@ -84,10 +84,7 @@ export default function SessionPage() {
       {Object.keys(namespaces).map((chain) => {
         return (
           <Fragment key={chain}>
-            <Text
-              h4
-              css={{ marginBottom: "$5" }}
-            >{`Review ${chain} permissions`}</Text>
+            <Text h4 css={{ marginBottom: "$5" }}>{`Review ${chain} permissions`}</Text>
             <SessionChainCard namespace={namespaces[chain]} />
             {/* {renderAccountSelection(chain)} */}
             <Divider y={2} />
@@ -98,18 +95,16 @@ export default function SessionPage() {
       <Text h4 css={{ marginBottom: "$5" }}>
         Mainnets
       </Text>
-      {Object.values(EIP155_MAINNET_CHAINS).map(
-        ({ name, logo, rgb, chainId }) => (
-          <AccountCard
-            key={name}
-            name={name}
-            chainId={chainId}
-            logo={logo}
-            rgb={rgb}
-            address={eip155Address}
-          />
-        ),
-      )}
+      {Object.values(EIP155_MAINNET_CHAINS).map(({ name, logo, rgb, chainId }) => (
+        <AccountCard
+          key={name}
+          name={name}
+          chainId={chainId}
+          logo={logo}
+          rgb={rgb}
+          address={eip155Address}
+        />
+      ))}
 
       <Row justify="space-between">
         <Text h5>Expiry</Text>
@@ -122,23 +117,8 @@ export default function SessionPage() {
       </Row>
 
       <Row css={{ marginTop: "$10" }}>
-        <Button
-          flat
-          css={{ width: "100%" }}
-          color="error"
-          onPress={onDeleteSession}
-        >
+        <Button flat css={{ width: "100%" }} color="error" onPress={onDeleteSession}>
           {loading ? <Loading size="sm" color="error" /> : "Delete"}
-        </Button>
-      </Row>
-      <Row css={{ marginTop: "$10" }}>
-        <Button
-          flat
-          css={{ width: "100%" }}
-          color="warning"
-          onPress={onSessionUpdate}
-        >
-          {loading ? <Loading size="sm" color="warning" /> : "Update"}
         </Button>
       </Row>
     </Fragment>

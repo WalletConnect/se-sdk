@@ -1,4 +1,5 @@
 import ModalStore from "@/store/ModalStore";
+import AuthRequestModal from "@/views/AuthRequestModal";
 import SessionProposalModal from "@/views/SessionProposalModal";
 import SessionSendTransactionModal from "@/views/SessionSendTransactionModal";
 import SessionRequestModal from "@/views/SessionSignModal";
@@ -17,6 +18,7 @@ export default function Modal() {
       {view === "SessionSignTypedDataModal" && <SessionSignTypedDataModal />}
       {view === "SessionSendTransactionModal" && <SessionSendTransactionModal />}
       {view === "SessionUnsuportedMethodModal" && <SessionUnsuportedMethodModal />}
+      {view === "AuthRequestModal" && <AuthRequestModal />}
     </NextModal>
   );
 }

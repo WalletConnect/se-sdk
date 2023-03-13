@@ -1,10 +1,11 @@
 import SettingsStore from "@/store/SettingsStore";
 import { Core } from "@walletconnect/core";
-import SingleEthereum from "@walletconnect/se-sdk";
+import { SingleEthereum, ISingleEthereum } from "@walletconnect/se-sdk";
 import { EIP155_MAINNET_CHAINS } from "@/data/EIP155Data";
+import { ICore } from "@walletconnect/types";
 
-export let web3wallet: InstanceType<typeof SingleEthereum>;
-export let core: InstanceType<typeof Core>;
+export let web3wallet: ISingleEthereum;
+export let core: ICore;
 
 export async function createWeb3Wallet() {
   if (!SettingsStore.state.web3WalletReady && typeof window !== "undefined") {

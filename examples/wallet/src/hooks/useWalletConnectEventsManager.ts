@@ -3,6 +3,7 @@ import { EIP155_SIGNING_METHODS } from "@/data/EIP155Data";
 import ModalStore from "@/store/ModalStore";
 import SettingsStore from "@/store/SettingsStore";
 import { web3wallet } from "@/utils/WalletConnectUtil";
+import { SingleEthereumTypes } from "@walletconnect/se-sdk";
 import { SignClientTypes } from "@walletconnect/types";
 import { useCallback, useEffect } from "react";
 import { useSnapshot } from "valtio";
@@ -65,6 +66,13 @@ export default function useWalletConnectEventsManager() {
     [],
   );
 
+  const onAuthRequest = useCallback(
+    (request: SingleEthereumTypes.EventArguments["auth_request"]) => {
+      ModalStore.open("AuthRequestModal", { authRequest: request });
+    },
+    [],
+  );
+
   /******************************************************************************
    * Set up WalletConnect event listeners
    *****************************************************************************/
@@ -75,6 +83,7 @@ export default function useWalletConnectEventsManager() {
       web3wallet.on("session_delete", (data: any) => {
         console.log("delete", data);
       });
+      web3wallet.on("auth_request", onAuthRequest);
     }
 
     return () => {
@@ -84,6 +93,7 @@ export default function useWalletConnectEventsManager() {
         web3wallet.off("session_delete", (data: any) => {
           console.log("delete", data);
         });
+        web3wallet.off("auth_request", onAuthRequest);
       }
     };
   }, [web3WalletReady, onSessionProposal, onSessionRequest]);

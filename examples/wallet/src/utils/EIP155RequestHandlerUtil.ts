@@ -51,6 +51,11 @@ export async function approveEIP155Request(
   }
 }
 
+export async function signWithEthereum(address: string, message: string) {
+  const wallet = eip155Wallets[address];
+  return await wallet.signMessage(message);
+}
+
 export function rejectEIP155Request(request: SignClientTypes.EventArguments["session_request"]) {
   const { id } = request;
 
