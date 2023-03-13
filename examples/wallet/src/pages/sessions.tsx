@@ -23,7 +23,6 @@ export default function SessionsPage() {
       {sessionTopics.length
         ? sessionTopics.map((topic) => {
             const { name, icons, url } = sessions[topic].peer.metadata;
-            console.log("name", name, topic);
             return <SessionCard key={topic} topic={topic} name={name} logo={icons[0]} url={url} />;
           })
         : null}
