@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import React, { useState } from "react";
 import { version } from "@walletconnect/universal-provider/package.json";
 import * as encoding from "@walletconnect/encoding";
-import { BigNumber, utils } from "ethers";
+import { BigNumber, ethers, utils } from "ethers";
 import { TypedDataField } from "@ethersproject/abstract-signer";
 import { Transaction } from "@ethereumjs/tx";
 
@@ -110,7 +110,7 @@ const Home: NextPage = () => {
     const balance = await web3Provider.getBalance(address);
     const nonce = await web3Provider.getTransactionCount(address);
     const tx = await formatTestTransaction("eip155:" + chainId + ":" + address, nonce);
-    tx.gasPrice = (await web3Provider.getFeeData()).gasPrice?.toNumber().toString() || "0";
+    tx.gasPrice = ethers.utils.hexlify((await web3Provider.getFeeData())?.gasPrice || 0);
     if (balance.lt(BigNumber.from(tx.gasPrice).mul(tx.gasLimit))) {
       return {
         method: "eth_sendTransaction",
@@ -140,7 +140,7 @@ const Home: NextPage = () => {
     const nonce = await web3Provider.getTransactionCount(address);
 
     const tx = await formatTestTransaction("eip155:" + chainId + ":" + address, nonce);
-    tx.gasPrice = (await web3Provider.getFeeData()).gasPrice?.toNumber().toString() || "0";
+    tx.gasPrice = ethers.utils.hexlify((await web3Provider.getFeeData())?.gasPrice || 0);
     const signedTx = await web3Provider.send("eth_signTransaction", [tx]);
     const valid = Transaction.fromSerializedTx(signedTx as any).verifySignature();
 
