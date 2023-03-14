@@ -14,9 +14,7 @@ import { Fragment, useEffect, useState } from "react";
 import SettingsStore from "@/store/SettingsStore";
 
 export default function SessionProposalModal() {
-  const [selectedAccounts, setSelectedAccounts] = useState<
-    Record<string, string[]>
-  >({});
+  const [selectedAccounts, setSelectedAccounts] = useState<Record<string, string[]>>({});
   const hasSelected = Object.keys(selectedAccounts).length;
 
   // Get proposal data and wallet address from store
@@ -31,34 +29,16 @@ export default function SessionProposalModal() {
   // Get required proposal data
   const { id, params } = proposal;
 
-  const {
-    proposer,
-    requiredNamespaces,
-    optionalNamespaces,
-    sessionProperties,
-    relays,
-  } = params;
-  console.log(
-    "proposal",
-    params,
-    requiredNamespaces,
-    optionalNamespaces,
-    sessionProperties,
-  );
-  const requiredNamespaceKeys = requiredNamespaces
-    ? Object.keys(requiredNamespaces)
-    : [];
-  const optionalNamespaceKeys = optionalNamespaces
-    ? Object.keys(optionalNamespaces)
-    : [];
+  const { proposer, requiredNamespaces, optionalNamespaces, sessionProperties, relays } = params;
+  console.log("proposal", params, requiredNamespaces, optionalNamespaces, sessionProperties);
+  const requiredNamespaceKeys = requiredNamespaces ? Object.keys(requiredNamespaces) : [];
+  const optionalNamespaceKeys = optionalNamespaces ? Object.keys(optionalNamespaces) : [];
   const pendingProposals = web3wallet.getPendingSessionProposals();
   console.log("pendingProposals", pendingProposals);
   // Add / remove address from EIP155 selection
   function onSelectAccount(chain: string, account: string) {
     if (selectedAccounts[chain]?.includes(account)) {
-      const newSelectedAccounts = selectedAccounts[chain]?.filter(
-        (a) => a !== account,
-      );
+      const newSelectedAccounts = selectedAccounts[chain]?.filter((a) => a !== account);
       setSelectedAccounts((prev) => ({
         ...prev,
         [chain]: newSelectedAccounts,
@@ -129,41 +109,17 @@ export default function SessionProposalModal() {
 
         <Divider y={2} />
 
-        {requiredNamespaceKeys.length
-? (
-          <Text h4>Required Namespaces</Text>
-        )
-: null}
+        {requiredNamespaceKeys.length ? <Text h4>Required Namespaces</Text> : null}
         {requiredNamespaceKeys.map((chain) => {
           return (
             <Fragment key={chain}>
-              <Text
-                css={{ marginBottom: "$5" }}
-              >{`Review ${chain} permissions`}</Text>
-              <SessionProposalChainCard
-                requiredNamespace={requiredNamespaces[chain]}
-              />
+              <Text css={{ marginBottom: "$5" }}>{`Review ${chain} permissions`}</Text>
+              <SessionProposalChainCard requiredNamespace={requiredNamespaces[chain]} />
               {renderAccountSelection(`required:${chain}`)}
               <Divider y={2} />
             </Fragment>
           );
         })}
-        {optionalNamespaceKeys ? <Text h4>Optional Namespaces</Text> : null}
-        {optionalNamespaceKeys.length &&
-          optionalNamespaceKeys.map((chain) => {
-            return (
-              <Fragment key={chain}>
-                <Text
-                  css={{ marginBottom: "$5" }}
-                >{`Review ${chain} permissions`}</Text>
-                <SessionProposalChainCard
-                  requiredNamespace={optionalNamespaces[chain]}
-                />
-                {renderAccountSelection(`optional:${chain}`)}
-                <Divider y={2} />
-              </Fragment>
-            );
-          })}
       </RequestModalContainer>
 
       <Modal.Footer>
