@@ -15,9 +15,9 @@ export async function approveEIP155Request(
   requestEvent: SignClientTypes.EventArguments["session_request"],
 ) {
   const { params, id } = requestEvent;
-  const { chainId, request } = params;
+  let { chainId, request } = params;
   const wallet = eip155Wallets[getWalletAddressFromParams(eip155Addresses, params)];
-
+  chainId = `eip155:${chainId}`;
   switch (request.method) {
     case EIP155_SIGNING_METHODS.PERSONAL_SIGN:
     case EIP155_SIGNING_METHODS.ETH_SIGN:
