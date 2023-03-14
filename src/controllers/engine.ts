@@ -180,7 +180,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"] = () => {
-    return [];
+    return this.web3wallet.getPendingAuthRequests();
   };
 
   public formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"] = (payload, address) => {

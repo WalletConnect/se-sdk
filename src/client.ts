@@ -166,6 +166,15 @@ export class SingleEthereum extends ISingleEthereum {
     }
   };
 
+  public getPendingAuthRequests: ISingleEthereum["getPendingAuthRequests"] = () => {
+    try {
+      return this.engine.getPendingAuthRequests();
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
   // ---------- Private ----------------------------------------------- //
 
   private async initialize() {

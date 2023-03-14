@@ -103,6 +103,7 @@ export abstract class ISingleEthereum {
   public abstract formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"];
   public abstract approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"];
   public abstract rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"];
+  public abstract getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"];
 
   // ---------- Event Handlers ----------------------------------------------- //
   public abstract on: <E extends SingleEthereumTypes.Event>(
