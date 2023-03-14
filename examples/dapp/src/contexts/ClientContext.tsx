@@ -156,9 +156,9 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
         chains: [1],
         methods: [
           "eth_sendTransaction",
+          "personal_sign",
           "eth_signTransaction",
           "eth_sign",
-          "personal_sign",
           "eth_signTypedData",
         ],
       });

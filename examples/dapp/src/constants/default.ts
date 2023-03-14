@@ -10,7 +10,7 @@ export const DEFAULT_MAIN_CHAINS = [
 
 export const DEFAULT_TEST_CHAINS = [
   // testnets
-  "eip155:42",
+  "eip155:5",
   "eip155:69",
   "eip155:80001",
   "eip155:421611",
@@ -23,11 +23,7 @@ export const DEFAULT_PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID;
 
 export const DEFAULT_RELAY_URL = process.env.NEXT_PUBLIC_RELAY_URL;
 
-export const DEFAULT_EIP155_METHODS = [
-  "eth_sendTransaction",
-  "personal_sign",
-  "eth_signTypedData",
-];
+export const DEFAULT_EIP155_METHODS = ["eth_sendTransaction", "personal_sign", "eth_signTypedData"];
 
 export enum DEFAULT_EIP_155_EVENTS {
   ETH_CHAIN_CHANGED = "chainChanged",
