@@ -8,6 +8,8 @@ class ClientLV {
 
   public pair(params: { uri: string }): Promise<void>;
 
+  // ----------------- Sign ----------------- //
+
   public approveSession(params: {
     id: number;
     chainId: number;
@@ -17,7 +19,7 @@ class ClientLV {
   public rejectSession(params: {
     id: number;
     error: {
-  	message: "OPTIONAL_ERROR_MESSAGE"
+  	  message: "OPTIONAL_ERROR_MESSAGE"
     }
   }): Promise<void>;
 
@@ -28,25 +30,25 @@ class ClientLV {
   }): Promise<void>;
 
   public approveRequest(params: {
-     topic: string;
-id: number,
-result: any,
+    topic: string;
+    id: number,
+    result: any,
   }): void;
 
   public rejectRequest(params: {
-     topic: string;
-id: number,
-error: {
-message: "OPTIONAL_ERROR_MESSAGE"
-}
+    topic: string;
+    id: number,
+    error: {
+      message: "OPTIONAL_ERROR_MESSAGE"
+    }
   }): void;
 
 
   public disconnectSession(params: {
-     topic: string;
-error: {
-message: "OPTIONAL_ERROR_MESSAGE"
-}
+    topic: string;
+    error: {
+      message: "OPTIONAL_ERROR_MESSAGE"
+    }
   }): Promise<void>;
 
   public getActiveSessions(): Promise<Record<string, Session>>;
@@ -55,13 +57,41 @@ message: "OPTIONAL_ERROR_MESSAGE"
 
   public getPendingSessionRequests(): Promise<Record<number, SessionRequest>>;
 
+  // ----------------- Auth ----------------- //
 
-  // ---------- Events ----------------------------------------------- //
+ public approveAuthRequest(params: {
+    id: number;
+    signature: string;
+    address: string;
+  }): Promise<void>;
+
+  public rejectAuthRequest(params: { id: number; error: ErrorResponse }): Promise<void>;
+
+ public formatAuthMessage(
+    payload: SingleEthereumTypes.CacaoRequestPayload,
+    address: string,
+  ): string;
+
+  public getPendingAuthRequests(): Record<number, SingleEthereumTypes.PendingAuthRequest>;
+
+  // ----------------- Events ----------------- //
 
   public on("session_proposal", (sessionProposal: SessionProposal) => {}): void;
 
   public on("session_request", (sessionRequest: SessionRequest) => {}): void;
 
-  public on("session_delete", (sessionDelete: { id: number, topic: string }) => {}): void;
+  public on("session_delete", (sessionDelete: {
+    id: number,
+    topic: string
+  }) => {}): void;
+
+  public on("auth_request", (params: {
+    id: number,
+    topic: string,
+    params: {
+      requester: AuthEngineTypes.PendingRequest["requester"], cacaoPayload: AuthEngineTypes.CacaoRequestPayload
+    }
+  }) => {}): void;
+
 }
 ```
