@@ -1,4 +1,5 @@
 {
+  "exclude": ["examples", "test"],
   "compilerOptions": {
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
@@ -36,6 +37,5 @@
     "rootDir": "src",
     "outDir": "./dist/types",
     "emitDeclarationOnly": true
-  },
-  "include": ["./src/**/*"],
+  }
 }

@@ -30,8 +30,8 @@ export const parseAccounts = (accounts: string[]) => {
 };
 
 export const parseSessions = (sessions: SessionTypes.Struct[]) => {
-  return sessions.reduce((sessionsMapping, session) => {
-    const parsedSession = cloneObject(session);
+  return sessions.reduce((sessionsMapping: Record<string, SessionTypes.Struct>, session) => {
+    const parsedSession: SessionTypes.Struct = cloneObject(session);
     const chains = session.namespaces[EVM_IDENTIFIER].chains || [];
     const accounts = session.namespaces[EVM_IDENTIFIER].accounts;
     parsedSession.namespaces[EVM_IDENTIFIER].chains = parseChains(chains);
@@ -44,8 +44,7 @@ export const parseSessions = (sessions: SessionTypes.Struct[]) => {
 export const parseProposal = (proposal: ProposalTypes.Struct) => {
   const parsedProposal = cloneObject(proposal);
   const chains = proposal.requiredNamespaces[EVM_IDENTIFIER].chains || [];
-  parsedProposal.requiredNamespaces[EVM_IDENTIFIER].chains =
-    parseChains(chains);
+  parsedProposal.requiredNamespaces[EVM_IDENTIFIER].chains = parseChains(chains);
   return parsedProposal;
 };
 
@@ -55,4 +54,8 @@ export const parseProposals = (proposals: ProposalTypes.Struct[]) => {
 
 export const cloneObject = (obj: any) => {
   return JSON.parse(JSON.stringify(obj));
+};
+
+export const formatAuthAddress = (address: string) => {
+  return address.includes("did:pkh") ? address : `did:pkh:eip155:1:${address}`;
 };

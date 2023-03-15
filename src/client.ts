@@ -41,10 +41,7 @@ export class SingleEthereum extends ISingleEthereum {
     return this.events.off(name, listener);
   };
 
-  public removeListener: ISingleEthereum["removeListener"] = (
-    name,
-    listener
-  ) => {
+  public removeListener: ISingleEthereum["removeListener"] = (name, listener) => {
     return this.events.removeListener(name, listener);
   };
 
@@ -104,9 +101,7 @@ export class SingleEthereum extends ISingleEthereum {
     }
   };
 
-  public disconnectSession: ISingleEthereum["disconnectSession"] = async (
-    params
-  ) => {
+  public disconnectSession: ISingleEthereum["disconnectSession"] = async (params) => {
     try {
       return await this.engine.disconnectSession(params);
     } catch (error: any) {
@@ -124,35 +119,71 @@ export class SingleEthereum extends ISingleEthereum {
     }
   };
 
-  public getPendingSessionProposals: ISingleEthereum["getPendingSessionProposals"] =
-    () => {
-      try {
-        return this.engine.getPendingSessionProposals();
-      } catch (error: any) {
-        this.logger.error(error.message);
-        throw error;
-      }
-    };
+  public getPendingSessionProposals: ISingleEthereum["getPendingSessionProposals"] = () => {
+    try {
+      return this.engine.getPendingSessionProposals();
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
 
-  public getPendingSessionRequests: ISingleEthereum["getPendingSessionRequests"] =
-    () => {
-      try {
-        return this.engine.getPendingSessionRequests();
-      } catch (error: any) {
-        this.logger.error(error.message);
-        throw error;
-      }
-    };
+  public getPendingSessionRequests: ISingleEthereum["getPendingSessionRequests"] = () => {
+    try {
+      return this.engine.getPendingSessionRequests();
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  // ---------- Auth ----------------------------------------------- //
+
+  public formatAuthMessage: ISingleEthereum["formatAuthMessage"] = (payload, address) => {
+    try {
+      return this.engine.formatAuthMessage(payload, address);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  public approveAuthRequest: ISingleEthereum["approveAuthRequest"] = (payload) => {
+    try {
+      return this.engine.approveAuthRequest(payload);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  public rejectAuthRequest: ISingleEthereum["rejectAuthRequest"] = (payload) => {
+    try {
+      return this.engine.rejectAuthRequest(payload);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  public getPendingAuthRequests: ISingleEthereum["getPendingAuthRequests"] = () => {
+    try {
+      return this.engine.getPendingAuthRequests();
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
 
   // ---------- Private ----------------------------------------------- //
 
   private async initialize() {
-    this.logger.trace(`Initialized`);
+    this.logger.trace("Initialized");
     try {
       await this.engine.init();
-      this.logger.info(`SingleEthereum Initialization Success`);
+      this.logger.info("SingleEthereum Initialization Success");
     } catch (error: any) {
-      this.logger.info(`SingleEthereum Initialization Failure`);
+      this.logger.info("SingleEthereum Initialization Failure");
       this.logger.error(error.message);
       throw error;
     }

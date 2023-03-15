@@ -5,13 +5,9 @@ import { prefixChainWithNamespace } from "./transform";
 export const validateProposalNamespaces = (proposal: ProposalTypes.Struct) => {
   if (
     // if the proposal contains non EVM namespaces
-    Object.keys(proposal.requiredNamespaces).some(
-      (key) => key !== EVM_IDENTIFIER
-    )
+    Object.keys(proposal.requiredNamespaces).some((key) => key !== EVM_IDENTIFIER)
   ) {
-    throw new Error(
-      "Invalid Session Proposal. Proposal contains non-EVM (`eip155`) namespaces."
-    );
+    throw new Error("Invalid Session Proposal. Proposal contains non-EVM (`eip155`) namespaces.");
   }
 };
 
@@ -25,17 +21,16 @@ export const validateProposalChains = (proposal: ProposalTypes.Struct) => {
     !eip155Chains ||
     eip155Chains.length > 1
   ) {
-    throw new Error(
-      "Invalid Session Chains. Proposed either no `eip155` chains or more than one."
-    );
+    throw new Error("Invalid Session Chains. Proposed either no `eip155` chains or more than one.");
   }
 };
 
-export const chainAlreadyInSession = (
-  session: SessionTypes.Struct,
-  chainId: number
-) => {
-  return session.namespaces?.[EVM_IDENTIFIER]?.chains?.includes(
-    prefixChainWithNamespace(chainId)
+export const chainAlreadyInSession = (session: SessionTypes.Struct, chainId: number) => {
+  return session.namespaces?.[EVM_IDENTIFIER]?.chains?.includes(prefixChainWithNamespace(chainId));
+};
+
+export const accountsAlreadyInSession = (session: SessionTypes.Struct, accounts: string[]) => {
+  return accounts.some((account) =>
+    session.namespaces?.[EVM_IDENTIFIER]?.accounts?.includes(account),
   );
 };

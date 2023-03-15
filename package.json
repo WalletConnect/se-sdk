@@ -1,7 +1,7 @@
 {
   "name": "@walletconnect/se-sdk",
   "description": "Single-Ethreum-SDK for WalletConnect Protocol",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "author": "WalletConnect, Inc. <walletconnect.com>",
   "homepage": "https://github.com/walletconnect/walletconnect-monorepo/",
@@ -25,20 +25,19 @@
     "build": "npm run build:pre; npm run build:source; npm run build:types",
     "test": "vitest run --dir test --no-threads",
     "lint": "eslint --fix './src/**/*.ts'",
-    "prettier": "prettier --check '{src,test}/**/*.{js,ts,jsx,tsx}'"
+    "prettier": "prettier --check '{src,test}/**/*.{js,ts,jsx,tsx}'",
+    "run:examples": "cd ./examples/dapp && yarn dev & cd ./examples/wallet && yarn dev",
+    "run:dapp": "cd ./examples/dapp && yarn dev",
+    "run:wallet": "cd ./examples/wallet && yarn dev",
+    "build:wallet": "yarn build && cd ./examples/wallet && yarn build",
+    "install:all": "yarn && cd ./examples/dapp && yarn && cd ./../wallet && yarn"
   },
   "dependencies": {
-    "@walletconnect/core": "^2.4.4",
-    "@walletconnect/jsonrpc-utils": "^1.0.4",
-    "@walletconnect/logger": "^2.0.1",
-    "@walletconnect/sign-client": "^2.4.4",
-    "@walletconnect/types": "^2.4.4",
-    "@walletconnect/utils": "^2.4.4",
-    "eslint-plugin-n": "^15.6.1"
+    "@walletconnect/web3wallet": "1.4.0"
   },
   "devDependencies": {
     "@ethersproject/wallet": "^5.7.0",
-    "@rollup/plugin-commonjs": "22.0.2",
+    "@rollup/plugin-commonjs": "24.0.1",
     "@rollup/plugin-node-resolve": "13.3.0",
     "@typescript-eslint/eslint-plugin": "5.33.0",
     "@typescript-eslint/parser": "5.33.0",
@@ -52,10 +51,20 @@
     "eslint-plugin-react": "7.30.1",
     "eslint-plugin-standard": "5.0.0",
     "lokijs": "^1.5.12",
+    "prettier": "^2.8.4",
     "rollup": "2.78.0",
     "rollup-plugin-esbuild": "4.9.3",
+    "rollup-plugin-polyfill-node": "0.10.2",
     "typescript": "4.7.4",
+    "utf-8-validate": "6.0.3",
     "vitest": "0.21.1",
-    "prettier": "^2.8.4"
+    "eslint-plugin-n": "^15.6.1"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "module": "./dist/index.es.js",
+      "default": "./dist/index.cjs.js"
+    }
   }
 }

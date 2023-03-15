@@ -2,9 +2,10 @@ import EventEmmiter, { EventEmitter } from "events";
 import { CoreTypes, ICore, ProposalTypes } from "@walletconnect/types";
 import { ISingleEthereumEngine } from "./engine";
 import { Logger } from "@walletconnect/logger";
+import { AuthClientTypes, AuthEngineTypes } from "@walletconnect/auth-client";
 
 export declare namespace SingleEthereumTypes {
-  type Event = "session_proposal" | "session_request" | "session_delete";
+  type Event = "session_proposal" | "session_request" | "session_delete" | "auth_request";
 
   interface BaseEventArgs<T = unknown> {
     id: number;
@@ -13,7 +14,7 @@ export declare namespace SingleEthereumTypes {
   }
 
   type SessionRequest = BaseEventArgs<{
-    request: { method: string; params: any };
+    request: { method: string; params: unknown };
     chainId: string;
   }>;
 
@@ -21,11 +22,17 @@ export declare namespace SingleEthereumTypes {
 
   type SessionDelete = Omit<BaseEventArgs, "params">;
 
+  type AuthRequest = BaseEventArgs<AuthClientTypes.AuthRequestEventArgs>;
+
   interface EventArguments {
     session_proposal: Omit<BaseEventArgs<ProposalTypes.Struct>, "topic">;
     session_request: SessionRequest;
     session_delete: Omit<BaseEventArgs, "params">;
+    auth_request: AuthRequest;
   }
+
+  type CacaoRequestPayload = AuthEngineTypes.CacaoRequestPayload;
+  type PendingAuthRequest = AuthEngineTypes.PendingRequest;
 
   interface Options {
     core: ICore;
@@ -43,27 +50,27 @@ export abstract class ISingleEthereumEvents extends EventEmmiter {
 
   public abstract emit: <E extends SingleEthereumTypes.Event>(
     event: E,
-    args: SingleEthereumTypes.EventArguments[E]
+    args: SingleEthereumTypes.EventArguments[E],
   ) => boolean;
 
   public abstract on: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 
   public abstract once: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 
   public abstract off: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 
   public abstract removeListener: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => any
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => any,
   ) => this;
 }
 
@@ -92,24 +99,30 @@ export abstract class ISingleEthereum {
   public abstract getPendingSessionProposals: ISingleEthereumEngine["getPendingSessionProposals"];
   public abstract getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"];
 
+  // auth //
+  public abstract formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"];
+  public abstract approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"];
+  public abstract rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"];
+  public abstract getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"];
+
   // ---------- Event Handlers ----------------------------------------------- //
   public abstract on: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 
   public abstract once: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 
   public abstract off: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 
   public abstract removeListener: <E extends SingleEthereumTypes.Event>(
     event: E,
-    listener: (args: SingleEthereumTypes.EventArguments[E]) => void
+    listener: (args: SingleEthereumTypes.EventArguments[E]) => void,
   ) => EventEmitter;
 }

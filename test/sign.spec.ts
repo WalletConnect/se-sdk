@@ -4,6 +4,7 @@ import { SignClient } from "@walletconnect/sign-client";
 import { ICore, ISignClient, SessionTypes } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
 import { Wallet as CryptoWallet } from "@ethersproject/wallet";
+import { TransactionRequest } from "@ethersproject/abstract-provider";
 
 import { expect, describe, it, beforeEach, beforeAll, afterAll } from "vitest";
 import { SingleEthereum, ISingleEthereum } from "../src";
@@ -158,7 +159,8 @@ describe("Sign Integration", () => {
       new Promise((resolve) => {
         wallet.on("session_request", async (sessionRequest) => {
           const { id, params } = sessionRequest;
-          const signTransaction = params.request.params[0];
+          const requestParams = params.request.params as TransactionRequest[];
+          const signTransaction = requestParams[0];
           const signature = await cryptoWallet.signTransaction(signTransaction);
           const response = await wallet.approveRequest({
             id,
@@ -273,8 +275,8 @@ describe("Sign Integration", () => {
 
     const sessions = wallet.getActiveSessions();
     expect(sessions).to.be.exist;
-    expect(Object.values(sessions).length).to.be.eq(1);
-    expect(Object.keys(sessions)[0]).to.be.eq(session.topic);
+    expect(Object.values(sessions!).length).to.be.eq(1);
+    expect(Object.keys(sessions!)[0]).to.be.eq(session.topic);
   });
 
   it("should get pending session proposals", async () => {
@@ -284,7 +286,7 @@ describe("Sign Integration", () => {
         wallet.on("session_proposal", () => {
           const proposals = wallet.getPendingSessionProposals();
           expect(proposals).to.be.exist;
-          expect(Object.values(proposals).length).to.be.eq(1);
+          expect(Object.values(proposals!).length).to.be.eq(1);
           resolve();
         });
       }),
@@ -328,7 +330,7 @@ describe("Sign Integration", () => {
       new Promise((resolve) => {
         wallet.on("session_request", async () => {
           const pendingRequests = wallet.getPendingSessionRequests();
-          const request = pendingRequests[0];
+          const request = pendingRequests![0];
           const signTransaction = request.params.request.params[0];
           const signature = await cryptoWallet.signTransaction(signTransaction);
           expectedError = formatJsonRpcError(request.id, signature);
