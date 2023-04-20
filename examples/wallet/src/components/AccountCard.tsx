@@ -16,17 +16,9 @@ interface Props {
   chainId: number;
 }
 
-export default function AccountCard({
-  name,
-  logo,
-  rgb,
-  address,
-  chainId,
-}: Props) {
+export default function AccountCard({ name, logo, rgb, address, chainId }: Props) {
   const [copied, setCopied] = useState(false);
-  const { activeChainId, account, activeSession } = useSnapshot(
-    SettingsStore.state,
-  );
+  const { activeChainId, account, activeSession } = useSnapshot(SettingsStore.state);
 
   function onCopy() {
     navigator?.clipboard?.writeText(address);
@@ -36,11 +28,13 @@ export default function AccountCard({
 
   async function onChainChanged(_chainId: number) {
     SettingsStore.setActiveChainId(_chainId);
-    await web3wallet.updateSession({
-      accounts: [eip155Addresses[account]],
-      chainId: _chainId,
-      topic: activeSession,
-    });
+    if (activeSession) {
+      await web3wallet.updateSession({
+        accounts: [eip155Addresses[account]],
+        chainId: _chainId,
+        topic: activeSession,
+      });
+    }
   }
   return (
     <ChainCard rgb={rgb} flexDirection="row" alignItems="center">

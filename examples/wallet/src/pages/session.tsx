@@ -1,7 +1,7 @@
 import PageHeader from "@/components/PageHeader";
 import ProjectInfoCard from "@/components/ProjectInfoCard";
 import SessionChainCard from "@/components/SessionChainCard";
-import { web3wallet } from "@/utils/WalletConnectUtil";
+import { web3wallet, updateSessions } from "@/utils/WalletConnectUtil";
 import { Button, Divider, Loading, Row, Text } from "@nextui-org/react";
 import { getSdkError } from "@walletconnect/utils";
 import { useRouter } from "next/router";
@@ -46,6 +46,7 @@ export default function SessionPage() {
       error: getSdkError("USER_DISCONNECTED"),
     });
     replace("/sessions");
+    updateSessions();
     setLoading(false);
   }
 

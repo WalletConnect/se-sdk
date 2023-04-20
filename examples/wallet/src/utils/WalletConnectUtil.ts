@@ -27,9 +27,16 @@ export async function createWeb3Wallet() {
 
     SettingsStore.setWeb3WalletReady(true);
     SettingsStore.setActiveChainId(EIP155_MAINNET_CHAINS["eip155:1"].chainId);
-    const sessions = web3wallet.getActiveSessions();
-    if (sessions) {
-      SettingsStore.setActiveSession(Object.keys(sessions)[0]);
-    }
+  }
+  updateSessions();
+}
+
+export function updateSessions() {
+  if (!web3wallet) return; // wallet not initialized yet
+  const sessions = web3wallet.getActiveSessions();
+  if (sessions) {
+    SettingsStore.setActiveSession(Object.keys(sessions)[0]);
+  } else {
+    SettingsStore.setActiveSession("");
   }
 }
