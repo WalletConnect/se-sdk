@@ -5,10 +5,10 @@ import { Card, Checkbox, Row, Text } from "@nextui-org/react";
  * Types
  */
 interface IProps {
-  address: string
-  index: number
-  selected: boolean
-  onSelect: () => void
+  address: string;
+  index: number;
+  selected: boolean;
+  onSelect: () => void;
 }
 
 /**
@@ -27,7 +27,8 @@ export default function AccountSelectCard({ address, selected, index, onSelect }
       }}
     >
       <Row justify="space-between" align="center">
-        <Checkbox size="lg" color="success" isSelected={selected} onChange={onSelect} />
+        {/* <Checkbox size="lg" color="success" isSelected={selected} onChange={onSelect} /> */}
+        <input type="checkbox" checked={selected} onChange={onSelect} />
         <Text>{`${truncate(address, 14)} - Account ${index + 1}`} </Text>
       </Row>
     </Card>
