@@ -30,9 +30,9 @@
   "dependencies": {
     "@ethereumjs/tx": "^3.5.0",
     "@walletconnect/encoding": "^1.0.1",
-    "@walletconnect/types": "2.4.4-canary-df6ed87b",
-    "@walletconnect/ethereum-provider": "2.4.4-canary-df6ed87b",
-    "@walletconnect/utils": "2.4.4-canary-df6ed87b",
+    "@walletconnect/types": "2.7.1",
+    "@walletconnect/ethereum-provider": "2.7.1",
+    "@walletconnect/utils": "2.7.1",
     "axios": "^0.21.1",
     "blockies-ts": "^1.0.0",
     "caip-api": "^2.0.0-beta.1",
