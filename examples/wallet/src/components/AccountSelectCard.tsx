@@ -27,7 +27,6 @@ export default function AccountSelectCard({ address, selected, index, onSelect }
       }}
     >
       <Row justify="space-between" align="center">
-        {/* <Checkbox size="lg" color="success" isSelected={selected} onChange={onSelect} /> */}
         <input type="checkbox" checked={selected} onChange={onSelect} />
         <Text>{`${truncate(address, 14)} - Account ${index + 1}`} </Text>
       </Row>

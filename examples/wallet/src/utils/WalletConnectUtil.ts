@@ -28,10 +28,10 @@ export async function createWeb3Wallet() {
     SettingsStore.setWeb3WalletReady(true);
     SettingsStore.setActiveChainId(EIP155_MAINNET_CHAINS["eip155:1"].chainId);
   }
-  updateSessions();
+  updateActiveSessions();
 }
 
-export function updateSessions() {
+export function updateActiveSessions() {
   if (!web3wallet) return; // wallet not initialized yet
   const sessions = web3wallet.getActiveSessions();
   if (sessions) {
