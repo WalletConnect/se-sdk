@@ -1909,7 +1909,7 @@
   dependencies:
     tslib "1.14.1"
 
-"@walletconnect/se-sdk@file:../..":
+"@walletconnect/se-sdk@./../../":
   version "1.1.0"
   dependencies:
     "@walletconnect/web3wallet" "1.6.0"

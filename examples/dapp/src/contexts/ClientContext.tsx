@@ -161,6 +161,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
           "eth_sign",
           "eth_signTypedData",
         ],
+        showQrModal: true,
       });
       setEthereumProvider(provider);
       setClient(provider.signer.client);
