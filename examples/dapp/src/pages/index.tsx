@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import React, { useState } from "react";
-import { version } from "@walletconnect/universal-provider/package.json";
 import * as encoding from "@walletconnect/encoding";
 import { BigNumber, ethers, utils } from "ethers";
 import { TypedDataField } from "@ethersproject/abstract-signer";
@@ -287,9 +286,6 @@ const Home: NextPage = () => {
     return !accounts.length && !Object.keys(balances).length ? (
       <SLanding center>
         <Banner />
-        <h6>
-          <span>{`Using v${version || "2.0.0-beta"}`}</span>
-        </h6>
         <SButtonContainer>
           <h6>Select an Ethereum chain:</h6>
           <SToggleContainer>

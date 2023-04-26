@@ -1,8 +1,9 @@
 import EventEmmiter, { EventEmitter } from "events";
-import { CoreTypes, ICore, ProposalTypes } from "@walletconnect/types";
+import { CoreTypes, ICore, Verify } from "@walletconnect/types";
 import { ISingleEthereumEngine } from "./engine";
 import { Logger } from "@walletconnect/logger";
-import { AuthClientTypes, AuthEngineTypes } from "@walletconnect/auth-client";
+import { AuthEngineTypes } from "@walletconnect/auth-client";
+import { Web3WalletTypes } from "@walletconnect/web3wallet";
 
 export declare namespace SingleEthereumTypes {
   type Event = "session_proposal" | "session_request" | "session_delete" | "auth_request";
@@ -16,18 +17,20 @@ export declare namespace SingleEthereumTypes {
   type SessionRequest = BaseEventArgs<{
     request: { method: string; params: unknown };
     chainId: string;
-  }>;
+  }> & {
+    context: Verify.Context;
+  };
 
-  type SessionProposal = Omit<BaseEventArgs<ProposalTypes.Struct>, "topic">;
+  type SessionProposal = Web3WalletTypes.SessionProposal;
 
   type SessionDelete = Omit<BaseEventArgs, "params">;
 
-  type AuthRequest = BaseEventArgs<AuthClientTypes.AuthRequestEventArgs>;
+  type AuthRequest = Web3WalletTypes.AuthRequest;
 
   interface EventArguments {
-    session_proposal: Omit<BaseEventArgs<ProposalTypes.Struct>, "topic">;
+    session_proposal: SessionProposal;
     session_request: SessionRequest;
-    session_delete: Omit<BaseEventArgs, "params">;
+    session_delete: SessionDelete;
     auth_request: AuthRequest;
   }
 

@@ -219,6 +219,7 @@ export class Engine extends ISingleEthereumEngine {
     return this.client.events.emit("session_proposal", {
       id: event.id,
       params: proposal,
+      context: event.context,
     });
   };
 
