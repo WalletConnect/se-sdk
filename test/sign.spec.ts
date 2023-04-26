@@ -139,7 +139,7 @@ describe("Sign Integration", () => {
     ]);
   });
 
-  it.only("should respond to session request", async () => {
+  it("should respond to session request", async () => {
     // first pair and approve session
     await Promise.all([
       new Promise((resolve) => {
