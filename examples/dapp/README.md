@@ -6,7 +6,7 @@
 
 ## Overview
 
-This is an example implementation of a React dApp (generated via `create-react-app`) using the v2 [`UniversalProvider`](https://github.com/WalletConnect/walletconnect-monorepo/tree/v2.0/providers/universal-provider) together with [`Ethers.js`](https://docs.ethers.io/v5/) to:
+This is an example implementation of a React dApp (generated via `create-react-app`) using the v2 [`EthereumProvider`](https://github.com/WalletConnect/walletconnect-monorepo/tree/v2.0/providers/ethereum-provider) together with [`Ethers.js`](https://docs.ethers.io/v5/) to:
 
 - handle pairings
 - manage sessions
