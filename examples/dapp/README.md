@@ -1,4 +1,4 @@
-# React dApp (with v2 UniversalProvider + Ethers.js)
+# React dApp (with v2 EthereumProvider + Ethers.js)
 
 🔗 Live dapp demo - https://react-dapp-v2-with-ethers.vercel.app <br />
 🔗 Live wallet demo - https://react-wallet.walletconnect.com/ <br />
