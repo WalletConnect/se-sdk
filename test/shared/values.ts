@@ -11,6 +11,7 @@ export const TEST_METHODS = [
   "personal_sign",
   "eth_signTypedData",
 ];
+export const TEST_OPTIONAL_METHODS = ["wallet_addEthereumChain", "wallet_switchEthereumChain"];
 export const TEST_EVENTS = ["chainChanged", "accountsChanged"];
 
 export const TEST_ETHEREUM_ADDRESS = "0x3c582121909DE92Dc89A36898633C1aE4790382b";
@@ -43,6 +44,14 @@ export const TEST_REQUIRED_NAMESPACES = {
     methods: TEST_METHODS,
     chains: [TEST_ETHEREUM_CHAIN],
     events: TEST_EVENTS,
+  },
+};
+
+export const TEST_OPTIONAL_NAMESPACES = {
+  eip155: {
+    methods: TEST_OPTIONAL_METHODS,
+    chains: [TEST_ETHEREUM_CHAIN],
+    events: [],
   },
 };
 
