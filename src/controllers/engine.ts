@@ -68,7 +68,6 @@ export class Engine extends ISingleEthereumEngine {
       ].methods
         .concat(optionalMethods)
         .flat();
-      console.log("optionalMethods", approveParams.namespaces[EVM_IDENTIFIER].methods);
     }
 
     const session = await this.web3wallet.approveSession(approveParams);
