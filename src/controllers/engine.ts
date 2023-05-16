@@ -61,6 +61,16 @@ export class Engine extends ISingleEthereumEngine {
       },
     };
 
+    const optionalMethods = proposal.optionalNamespaces[EVM_IDENTIFIER]?.methods;
+    if (optionalMethods) {
+      approveParams.namespaces[EVM_IDENTIFIER].methods = approveParams.namespaces[
+        EVM_IDENTIFIER
+      ].methods
+        .concat(optionalMethods)
+        .flat();
+      console.log("optionalMethods", approveParams.namespaces[EVM_IDENTIFIER].methods);
+    }
+
     const session = await this.web3wallet.approveSession(approveParams);
     this.chainId = chainId;
 
