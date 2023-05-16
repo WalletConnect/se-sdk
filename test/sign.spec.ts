@@ -20,6 +20,7 @@ import {
   TEST_REQUIRED_NAMESPACES,
   TEST_UPDATED_NAMESPACES,
 } from "./shared";
+import { prefixChainWithNamespace } from "../src/utils";
 
 describe("Sign Integration", () => {
   let core: ICore;
@@ -69,6 +70,36 @@ describe("Sign Integration", () => {
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
+          });
+          resolve(session);
+        });
+      }),
+      new Promise(async (resolve) => {
+        resolve(await sessionApproval());
+      }),
+      wallet.pair({ uri: uriString }),
+    ]);
+  });
+  it("should approve session proposal with a different chainId", async () => {
+    const newChainId = 2;
+    await Promise.all([
+      new Promise((resolve) => {
+        dapp.on("session_event", (sessionEvent) => {
+          const { params } = sessionEvent;
+          expect(params.chainId).to.eq(prefixChainWithNamespace(newChainId));
+          expect(params.event.name).to.eq("chainChanged");
+          resolve(true);
+        });
+      }),
+      new Promise((resolve) => {
+        wallet.on("session_proposal", async (sessionProposal) => {
+          const { id, params, context } = sessionProposal;
+          expect(context).to.be.exist;
+          expect(context.verified.validation).to.eq("UNKNOWN");
+          session = await wallet.approveSession({
+            id,
+            ...TEST_APPROVE_PARAMS,
+            chainId: newChainId,
           });
           resolve(session);
         });
