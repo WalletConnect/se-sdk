@@ -42,19 +42,49 @@ export class Engine extends ISingleEthereumEngine {
   public approveSession: ISingleEthereumEngine["approveSession"] = async (params) => {
     const { id, chainId, accounts } = params;
     const proposal = this.web3wallet.engine.signClient.proposal.get(id);
+    const requiredChain = proposal.requiredNamespaces[EVM_IDENTIFIER].chains?.[0];
+    const requiredParsed = requiredChain ? parseInt(parseChain(requiredChain)) : chainId;
+    const approvedChains = [requiredParsed];
+
+    if (requiredParsed !== chainId) {
+      approvedChains.push(chainId);
+    }
+
     const approveParams = {
       id,
       namespaces: {
         [EVM_IDENTIFIER]: {
           ...proposal.requiredNamespaces[EVM_IDENTIFIER],
-          accounts: formatAccounts(accounts, chainId),
-          chains: [prefixChainWithNamespace(chainId)],
+          accounts: approvedChains.map((chain) => formatAccounts(accounts, chain)).flat(),
+          chains: approvedChains.map((chain) => prefixChainWithNamespace(chain)),
         },
       },
     };
 
+    const optionalMethods = proposal.optionalNamespaces[EVM_IDENTIFIER]?.methods;
+    if (optionalMethods) {
+      approveParams.namespaces[EVM_IDENTIFIER].methods = approveParams.namespaces[
+        EVM_IDENTIFIER
+      ].methods
+        .concat(optionalMethods)
+        .flat();
+    }
+
     const session = await this.web3wallet.approveSession(approveParams);
     this.chainId = chainId;
+
+    // emit chainChanged if a different chain is approved other than the required
+    if (approvedChains.length > 1) {
+      await this.web3wallet.emitSessionEvent({
+        topic: session.topic,
+        event: {
+          name: "chainChanged",
+          data: chainId,
+        },
+        chainId: prefixChainWithNamespace(chainId),
+      });
+    }
+
     return session;
   };
 

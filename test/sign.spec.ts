@@ -7,7 +7,7 @@ import { Wallet as CryptoWallet } from "@ethersproject/wallet";
 import { TransactionRequest } from "@ethersproject/abstract-provider";
 
 import { expect, describe, it, beforeEach, beforeAll, afterAll } from "vitest";
-import { SingleEthereum, ISingleEthereum } from "../src";
+import { SingleEthereum, ISingleEthereum, EVM_IDENTIFIER } from "../src";
 import {
   disconnect,
   TEST_APPROVE_PARAMS,
@@ -17,9 +17,11 @@ import {
   TEST_ETHEREUM_CHAIN_PARSED,
   TEST_GOERLI_CHAIN_PARSED,
   TEST_NAMESPACES,
+  TEST_OPTIONAL_NAMESPACES,
   TEST_REQUIRED_NAMESPACES,
   TEST_UPDATED_NAMESPACES,
 } from "./shared";
+import { prefixChainWithNamespace } from "../src/utils";
 
 describe("Sign Integration", () => {
   let core: ICore;
@@ -46,6 +48,7 @@ describe("Sign Integration", () => {
     });
     const { uri, approval } = await dapp.connect({
       requiredNamespaces: TEST_REQUIRED_NAMESPACES,
+      optionalNamespaces: TEST_OPTIONAL_NAMESPACES,
     });
     uriString = uri || "";
     sessionApproval = approval;
@@ -78,6 +81,61 @@ describe("Sign Integration", () => {
       }),
       wallet.pair({ uri: uriString }),
     ]);
+  });
+  it("should approve session proposal with a different chainId", async () => {
+    const newChainId = 2;
+    await Promise.all([
+      new Promise((resolve) => {
+        dapp.on("session_event", (sessionEvent) => {
+          const { params } = sessionEvent;
+          expect(params.chainId).to.eq(prefixChainWithNamespace(newChainId));
+          expect(params.event.name).to.eq("chainChanged");
+          resolve(true);
+        });
+      }),
+      new Promise((resolve) => {
+        wallet.on("session_proposal", async (sessionProposal) => {
+          const { id, params, context } = sessionProposal;
+          expect(context).to.be.exist;
+          expect(context.verified.validation).to.eq("UNKNOWN");
+          session = await wallet.approveSession({
+            id,
+            ...TEST_APPROVE_PARAMS,
+            chainId: newChainId,
+          });
+          resolve(session);
+        });
+      }),
+      new Promise(async (resolve) => {
+        resolve(await sessionApproval());
+      }),
+      wallet.pair({ uri: uriString }),
+    ]);
+  });
+  it("should approve session proposal with optional methods", async () => {
+    const newChainId = 2;
+    await Promise.all([
+      new Promise((resolve) => {
+        wallet.on("session_proposal", async (sessionProposal) => {
+          const { id, params, context } = sessionProposal;
+          expect(context).to.be.exist;
+          expect(context.verified.validation).to.eq("UNKNOWN");
+          session = await wallet.approveSession({
+            id,
+            ...TEST_APPROVE_PARAMS,
+            chainId: newChainId,
+          });
+          resolve(session);
+        });
+      }),
+      new Promise(async (resolve) => {
+        resolve(await sessionApproval());
+      }),
+      wallet.pair({ uri: uriString }),
+    ]);
+    expect(session.namespaces[EVM_IDENTIFIER].methods).to.deep.eq(
+      TEST_REQUIRED_NAMESPACES.eip155.methods.concat(TEST_OPTIONAL_NAMESPACES.eip155.methods),
+    );
   });
   it("should reject session proposal", async () => {
     const rejectionError = getSdkError("USER_REJECTED");
