@@ -18,7 +18,7 @@ export declare namespace SingleEthereumTypes {
     request: { method: string; params: unknown };
     chainId: string;
   }> & {
-    context: Verify.Context;
+    verifyContext: Verify.Context;
   };
 
   type SessionProposal = Web3WalletTypes.SessionProposal;

@@ -245,11 +245,10 @@ export class Engine extends ISingleEthereumEngine {
         error: getSdkError("UNSUPPORTED_CHAINS"),
       });
     }
-
     return this.client.events.emit("session_proposal", {
       id: event.id,
       params: proposal,
-      context: event.context,
+      verifyContext: event.verifyContext,
     });
   };
 

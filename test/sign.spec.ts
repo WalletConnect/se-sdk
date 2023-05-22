@@ -66,9 +66,9 @@ describe("Sign Integration", () => {
     await Promise.all([
       new Promise((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
-          const { id, params, context } = sessionProposal;
-          expect(context).to.be.exist;
-          expect(context.verified.validation).to.eq("UNKNOWN");
+          const { id, params, verifyContext } = sessionProposal;
+          expect(verifyContext).to.be.exist;
+          expect(verifyContext.verified.validation).to.eq("UNKNOWN");
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
@@ -95,9 +95,9 @@ describe("Sign Integration", () => {
       }),
       new Promise((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
-          const { id, params, context } = sessionProposal;
-          expect(context).to.be.exist;
-          expect(context.verified.validation).to.eq("UNKNOWN");
+          const { id, params, verifyContext } = sessionProposal;
+          expect(verifyContext).to.be.exist;
+          expect(verifyContext.verified.validation).to.eq("UNKNOWN");
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
@@ -117,9 +117,9 @@ describe("Sign Integration", () => {
     await Promise.all([
       new Promise((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
-          const { id, params, context } = sessionProposal;
-          expect(context).to.be.exist;
-          expect(context.verified.validation).to.eq("UNKNOWN");
+          const { id, params, verifyContext } = sessionProposal;
+          expect(verifyContext).to.be.exist;
+          expect(verifyContext.verified.validation).to.eq("UNKNOWN");
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
@@ -218,9 +218,9 @@ describe("Sign Integration", () => {
     await Promise.all([
       new Promise((resolve) => {
         wallet.on("session_request", async (sessionRequest) => {
-          const { id, params, context } = sessionRequest;
-          expect(context).to.be.exist;
-          expect(context.verified.validation).to.eq("UNKNOWN");
+          const { id, params, verifyContext } = sessionRequest;
+          expect(verifyContext).to.be.exist;
+          expect(verifyContext.verified.validation).to.eq("UNKNOWN");
           const requestParams = params.request.params as TransactionRequest[];
           const signTransaction = requestParams[0];
           const signature = await cryptoWallet.signTransaction(signTransaction);
