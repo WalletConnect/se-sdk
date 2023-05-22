@@ -74,7 +74,7 @@ export class Engine extends ISingleEthereumEngine {
     this.chainId = chainId;
     // emit chainChanged if a different chain is approved other than the required
     if (approvedChains.length > 1) {
-      this.changeChain(session.topic, chainId);
+      setTimeout(() => this.changeChain(session.topic, chainId), 2_000);
     }
 
     return session;

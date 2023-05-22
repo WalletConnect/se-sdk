@@ -69,9 +69,6 @@ describe("Sign Integration", () => {
           const { id, params, verifyContext } = sessionProposal;
           expect(verifyContext).to.be.exist;
           expect(verifyContext.verified.validation).to.eq("UNKNOWN");
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
@@ -101,9 +98,6 @@ describe("Sign Integration", () => {
           const { id, params, verifyContext } = sessionProposal;
           expect(verifyContext).to.be.exist;
           expect(verifyContext.verified.validation).to.eq("UNKNOWN");
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
@@ -126,10 +120,6 @@ describe("Sign Integration", () => {
           const { id, params, verifyContext } = sessionProposal;
           expect(verifyContext).to.be.exist;
           expect(verifyContext.verified.validation).to.eq("UNKNOWN");
-
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
@@ -178,10 +168,6 @@ describe("Sign Integration", () => {
       new Promise((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
           const { id, params } = sessionProposal;
-
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
           session = await wallet.approveSession({
             id,
             ...TEST_APPROVE_PARAMS,
@@ -217,10 +203,6 @@ describe("Sign Integration", () => {
       new Promise((resolve) => {
         wallet.on("session_proposal", async (sessionProposal) => {
           const { id, params } = sessionProposal;
-
-          await new Promise((resolve) => {
-            setTimeout(resolve, 1000);
-          });
           session = await wallet.approveSession({
             id,
             chainId: TEST_ETHEREUM_CHAIN_PARSED,
