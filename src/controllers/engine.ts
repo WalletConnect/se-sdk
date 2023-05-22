@@ -75,7 +75,7 @@ export class Engine extends ISingleEthereumEngine {
 
     // emit chainChanged if a different chain is approved other than the required
     if (approvedChains.length > 1) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1_000));
       await this.web3wallet.emitSessionEvent({
         topic: session.topic,
         event: {
