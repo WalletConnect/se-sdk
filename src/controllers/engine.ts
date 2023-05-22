@@ -72,17 +72,9 @@ export class Engine extends ISingleEthereumEngine {
 
     const session = await this.web3wallet.approveSession(approveParams);
     this.chainId = chainId;
-
     // emit chainChanged if a different chain is approved other than the required
     if (approvedChains.length > 1) {
-      await this.web3wallet.emitSessionEvent({
-        topic: session.topic,
-        event: {
-          name: "chainChanged",
-          data: chainId,
-        },
-        chainId: prefixChainWithNamespace(chainId),
-      });
+      setTimeout(() => this.changeChain(session.topic, chainId), 2_000);
     }
 
     return session;
@@ -117,14 +109,7 @@ export class Engine extends ISingleEthereumEngine {
     });
 
     if (this.chainId !== chainId) {
-      await this.web3wallet.emitSessionEvent({
-        topic,
-        event: {
-          name: "chainChanged",
-          data: chainId,
-        },
-        chainId: formattedChain,
-      });
+      await this.changeChain(topic, chainId);
       this.chainId = chainId;
     }
 
@@ -245,11 +230,10 @@ export class Engine extends ISingleEthereumEngine {
         error: getSdkError("UNSUPPORTED_CHAINS"),
       });
     }
-
     return this.client.events.emit("session_proposal", {
       id: event.id,
       params: proposal,
-      context: event.context,
+      verifyContext: event.verifyContext,
     });
   };
 
@@ -278,5 +262,17 @@ export class Engine extends ISingleEthereumEngine {
         ),
       );
     }
+  };
+
+  private changeChain = async (topic: string, chainId: number) => {
+    await this.web3wallet.engine.signClient.ping({ topic });
+    await this.web3wallet.emitSessionEvent({
+      topic,
+      event: {
+        name: "chainChanged",
+        data: chainId,
+      },
+      chainId: prefixChainWithNamespace(chainId),
+    });
   };
 }

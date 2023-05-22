@@ -33,7 +33,7 @@ export const TEST_NAMESPACES = {
 
 export const TEST_UPDATED_NAMESPACES = {
   eip155: {
-    methods: TEST_METHODS,
+    methods: TEST_METHODS.concat(TEST_OPTIONAL_METHODS),
     accounts: [TEST_ETHEREUM_ACCOUNT, TEST_GOERLI_ACCOUNT],
     events: TEST_EVENTS,
   },
