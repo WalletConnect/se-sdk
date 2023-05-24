@@ -6,7 +6,12 @@ import { AuthEngineTypes } from "@walletconnect/auth-client";
 import { Web3WalletTypes } from "@walletconnect/web3wallet";
 
 export declare namespace SingleEthereumTypes {
-  type Event = "session_proposal" | "session_request" | "session_delete" | "auth_request";
+  type Event =
+    | "session_proposal"
+    | "session_proposal_error"
+    | "session_request"
+    | "session_delete"
+    | "auth_request";
 
   interface BaseEventArgs<T = unknown> {
     id: number;
@@ -27,8 +32,14 @@ export declare namespace SingleEthereumTypes {
 
   type AuthRequest = Web3WalletTypes.AuthRequest;
 
+  type SessionProposalError = {
+    message: string;
+    code: number;
+  };
+
   interface EventArguments {
     session_proposal: SessionProposal;
+    session_proposal_error: SessionProposalError;
     session_request: SessionRequest;
     session_delete: SessionDelete;
     auth_request: AuthRequest;
