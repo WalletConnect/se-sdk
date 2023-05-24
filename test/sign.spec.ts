@@ -19,6 +19,8 @@ import {
   TEST_NAMESPACES,
   TEST_OPTIONAL_NAMESPACES,
   TEST_REQUIRED_NAMESPACES,
+  TEST_REQUIRED_NAMESPACES_FAIL_CHAINS,
+  TEST_REQUIRED_NAMESPACES_FAIL_NAMESPACES,
   TEST_UPDATED_NAMESPACES,
 } from "./shared";
 import { prefixChainWithNamespace } from "../src/utils";
@@ -418,5 +420,79 @@ describe("Sign Integration", () => {
         resolve();
       }),
     ]);
+  });
+  it("should emit session_proposal_error with failed chains validation", async () => {
+    const core = new Core(TEST_CORE_OPTIONS);
+    const dapp = await SignClient.init({
+      ...TEST_CORE_OPTIONS,
+      name: "Dapp",
+    });
+    const { uri, approval } = await dapp.connect({
+      requiredNamespaces: TEST_REQUIRED_NAMESPACES_FAIL_CHAINS,
+    });
+    const uriString = uri || "";
+    const wallet = await SingleEthereum.init({
+      core,
+      name: "wallet",
+      metadata: {} as any,
+    });
+    const expectedError = getSdkError("UNSUPPORTED_CHAINS");
+    await Promise.all([
+      new Promise<void>(async (resolve) => {
+        wallet.on("session_proposal_error", (sessionProposalError) => {
+          expect(sessionProposalError).to.be.exist;
+          expect(sessionProposalError).to.toMatchObject(expectedError);
+          resolve();
+        });
+      }),
+      new Promise<void>(async (resolve) => {
+        await approval().catch((error) => {
+          expect(error).to.be.exist;
+          expect(error).to.toMatchObject(expectedError);
+          resolve();
+        });
+      }),
+      wallet.pair({ uri: uriString }),
+    ]);
+    [dapp, wallet].forEach(async (client) => {
+      await disconnect(client.core);
+    });
+  });
+  it("should emit session_proposal_error with failed namespaces validation", async () => {
+    const core = new Core(TEST_CORE_OPTIONS);
+    const dapp = await SignClient.init({
+      ...TEST_CORE_OPTIONS,
+      name: "Dapp",
+    });
+    const { uri, approval } = await dapp.connect({
+      requiredNamespaces: TEST_REQUIRED_NAMESPACES_FAIL_NAMESPACES,
+    });
+    const uriString = uri || "";
+    const wallet = await SingleEthereum.init({
+      core,
+      name: "wallet",
+      metadata: {} as any,
+    });
+    const expectedError = getSdkError("UNSUPPORTED_NAMESPACE_KEY");
+    await Promise.all([
+      new Promise<void>(async (resolve) => {
+        wallet.on("session_proposal_error", (sessionProposalError) => {
+          expect(sessionProposalError).to.be.exist;
+          expect(sessionProposalError).to.toMatchObject(expectedError);
+          resolve();
+        });
+      }),
+      new Promise<void>(async (resolve) => {
+        await approval().catch((error) => {
+          expect(error).to.be.exist;
+          expect(error).to.toMatchObject(expectedError);
+          resolve();
+        });
+      }),
+      wallet.pair({ uri: uriString }),
+    ]);
+    [dapp, wallet].forEach(async (client) => {
+      await disconnect(client.core);
+    });
   });
 });

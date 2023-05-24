@@ -215,9 +215,11 @@ export class Engine extends ISingleEthereumEngine {
       validateProposalNamespaces(proposal);
     } catch (e) {
       this.client.logger.error(e);
+      const error = getSdkError("UNSUPPORTED_NAMESPACE_KEY");
+      this.client.events.emit("session_proposal_error", error);
       return this.rejectSession({
         id: event.id,
-        error: getSdkError("UNSUPPORTED_NAMESPACE_KEY"),
+        error,
       });
     }
 
@@ -225,9 +227,11 @@ export class Engine extends ISingleEthereumEngine {
       validateProposalChains(proposal);
     } catch (e) {
       this.client.logger.error(e);
+      const error = getSdkError("UNSUPPORTED_CHAINS");
+      this.client.events.emit("session_proposal_error", error);
       return this.rejectSession({
         id: event.id,
-        error: getSdkError("UNSUPPORTED_CHAINS"),
+        error,
       });
     }
     return this.client.events.emit("session_proposal", {
