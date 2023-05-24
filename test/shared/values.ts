@@ -47,6 +47,27 @@ export const TEST_REQUIRED_NAMESPACES = {
   },
 };
 
+export const TEST_REQUIRED_NAMESPACES_FAIL_CHAINS = {
+  eip155: {
+    methods: TEST_METHODS,
+    chains: [TEST_ETHEREUM_CHAIN, TEST_ARBITRUM_CHAIN],
+    events: TEST_EVENTS,
+  },
+};
+
+export const TEST_REQUIRED_NAMESPACES_FAIL_NAMESPACES = {
+  eip155: {
+    methods: TEST_METHODS,
+    chains: [TEST_ETHEREUM_CHAIN],
+    events: TEST_EVENTS,
+  },
+  xyz: {
+    methods: TEST_METHODS,
+    chains: ["xyz:1"],
+    events: TEST_EVENTS,
+  },
+};
+
 export const TEST_OPTIONAL_NAMESPACES = {
   eip155: {
     methods: TEST_OPTIONAL_METHODS,
