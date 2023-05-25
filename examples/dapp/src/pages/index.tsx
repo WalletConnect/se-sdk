@@ -104,20 +104,20 @@ const Home: NextPage = () => {
       throw new Error("web3Provider not connected");
     }
 
-    const { chainId } = await web3Provider.getNetwork();
+    // const { chainId } = await web3Provider.getNetwork();
     const address = activeAccount;
-    const balance = await web3Provider.getBalance(address);
-    const nonce = await web3Provider.getTransactionCount(address);
-    const tx = await formatTestTransaction("eip155:" + chainId + ":" + address, nonce);
+    // const balance = await web3Provider.getBalance(address);
+    // const nonce = await web3Provider.getTransactionCount(address);
+    const tx = await formatTestTransaction("eip155:" + 1 + ":" + address, 1);
     tx.gasPrice = ethers.utils.hexlify((await web3Provider.getFeeData())?.gasPrice || 0);
-    if (balance.lt(BigNumber.from(tx.gasPrice).mul(tx.gasLimit))) {
-      return {
-        method: "eth_sendTransaction",
-        address,
-        valid: false,
-        result: "Insufficient funds for intrinsic transaction cost",
-      };
-    }
+    // if (balance.lt(BigNumber.from(tx.gasPrice).mul(tx.gasLimit))) {
+    //   return {
+    //     method: "eth_sendTransaction",
+    //     address,
+    //     valid: false,
+    //     result: "Insufficient funds for intrinsic transaction cost",
+    //   };
+    // }
 
     const txHash = await web3Provider.send("eth_sendTransaction", [tx]);
 
