@@ -17,6 +17,7 @@ import type Client from "@walletconnect/sign-client";
 import { DEFAULT_PROJECT_ID } from "../constants";
 import { providers, utils } from "ethers";
 import { AccountBalances, ChainNamespaces, getAllChainNamespaces } from "../helpers";
+import { EIP155Metadata } from "../chains/eip155";
 /**
  * Types
  */
@@ -163,6 +164,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
           "eth_signTypedData",
         ],
         showQrModal: true,
+        optionalChains: Object.keys(EIP155Metadata).map((k) => parseInt(k, 10)),
       });
       setEthereumProvider(provider);
       setClient(provider.signer.client);
