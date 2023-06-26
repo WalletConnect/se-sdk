@@ -3,10 +3,7 @@ import RequesDetailsCard from "@/components/RequestDetalilsCard";
 import RequestMethodCard from "@/components/RequestMethodCard";
 import RequestModalContainer from "@/components/RequestModalContainer";
 import ModalStore from "@/store/ModalStore";
-import {
-  approveEIP155Request,
-  rejectEIP155Request,
-} from "@/utils/EIP155RequestHandlerUtil";
+import { approveEIP155Request, rejectEIP155Request } from "@/utils/EIP155RequestHandlerUtil";
 import { getSignParamsMessage } from "@/utils/HelperUtil";
 import { web3wallet } from "@/utils/WalletConnectUtil";
 import { Button, Col, Divider, Modal, Row, Text } from "@nextui-org/react";
@@ -28,7 +25,7 @@ export default function SessionSignModal() {
   const { request, chainId } = params;
 
   // Get message, convert it to UTF8 string if it is valid hex
-  const message = getSignParamsMessage(request.params);
+  const message = getSignParamsMessage(request.params as string[]);
 
   // Handle approve action (logic varies based on request method)
   async function onApprove() {
@@ -61,10 +58,7 @@ export default function SessionSignModal() {
 
         <Divider y={2} />
 
-        <RequesDetailsCard
-          chains={[chainId ?? ""]}
-          protocol={requestSession.relay.protocol}
-        />
+        <RequesDetailsCard chains={[chainId ?? ""]} protocol={requestSession.relay.protocol} />
 
         <Divider y={2} />
 

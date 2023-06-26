@@ -4,10 +4,7 @@ import RequesDetailsCard from "@/components/RequestDetalilsCard";
 import RequestMethodCard from "@/components/RequestMethodCard";
 import RequestModalContainer from "@/components/RequestModalContainer";
 import ModalStore from "@/store/ModalStore";
-import {
-  approveEIP155Request,
-  rejectEIP155Request,
-} from "@/utils/EIP155RequestHandlerUtil";
+import { approveEIP155Request, rejectEIP155Request } from "@/utils/EIP155RequestHandlerUtil";
 import { getSignTypedDataParamsData } from "@/utils/HelperUtil";
 import { web3wallet } from "@/utils/WalletConnectUtil";
 import { Button, Divider, Modal, Text } from "@nextui-org/react";
@@ -29,7 +26,7 @@ export default function SessionSignTypedDataModal() {
   const { request, chainId } = params;
 
   // Get data
-  const data = getSignTypedDataParamsData(request.params);
+  const data = getSignTypedDataParamsData(request.params as string[]);
 
   // Handle approve action (logic varies based on request method)
   async function onApprove() {
@@ -61,10 +58,7 @@ export default function SessionSignTypedDataModal() {
 
         <Divider y={2} />
 
-        <RequesDetailsCard
-          chains={[chainId ?? ""]}
-          protocol={requestSession.relay.protocol}
-        />
+        <RequesDetailsCard chains={[chainId ?? ""]} protocol={requestSession.relay.protocol} />
 
         <Divider y={2} />
 

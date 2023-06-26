@@ -15,7 +15,7 @@ export default function useWalletConnectEventsManager() {
    * 1. Open session proposal modal for confirmation / rejection
    *****************************************************************************/
   const onSessionProposal = useCallback(
-    (proposal: SignClientTypes.EventArguments["session_proposal"]) => {
+    (proposal: SingleEthereumTypes.EventArguments["session_proposal"]) => {
       ModalStore.open("SessionProposalModal", { proposal });
     },
     [],
@@ -25,7 +25,7 @@ export default function useWalletConnectEventsManager() {
    * 3. Open request handling modal based on method that was used
    *****************************************************************************/
   const onSessionRequest = useCallback(
-    async (requestEvent: SignClientTypes.EventArguments["session_request"]) => {
+    async (requestEvent: SingleEthereumTypes.EventArguments["session_request"]) => {
       console.log("session_request", requestEvent);
       const { topic, params } = requestEvent;
       const { request } = params;

@@ -10,7 +10,7 @@ export let core: ICore;
 export async function createWeb3Wallet() {
   if (!SettingsStore.state.web3WalletReady && typeof window !== "undefined") {
     core = new Core({
-      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+      projectId: process.env.NEXT_PUBLIC_PROJECT_ID as string,
       logger: "debug",
       relayUrl: process.env.NEXT_PUBLIC_RELAY_URL,
     });
