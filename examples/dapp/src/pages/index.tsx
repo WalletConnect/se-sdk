@@ -64,6 +64,7 @@ const Home: NextPage = () => {
     web3Provider,
     activeAccount,
     activeChainId,
+    ethereumProvider,
   } = useWalletConnectClient();
 
   const verifyEip155MessageSignature = (message: string, signature: string, address: string) =>
@@ -319,7 +320,12 @@ const Home: NextPage = () => {
   return (
     <SLayout>
       <Column maxWidth={1000} spanHeight>
-        <Header ping={onPing} disconnect={disconnect} session={session} />
+        <Header
+          ping={onPing}
+          disconnect={disconnect}
+          session={session}
+          ethereumProvider={ethereumProvider}
+        />
         <SContent>{isInitializing ? "Loading..." : renderContent()}</SContent>
       </Column>
       <Modal show={!!modal} closeModal={closeModal}>

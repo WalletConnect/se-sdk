@@ -35,6 +35,7 @@ interface IContext {
   web3Provider?: providers.Web3Provider;
   activeAccount: string;
   activeChainId: number;
+  ethereumProvider?: IEthereumProvider;
 }
 
 /**
@@ -321,6 +322,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
       web3Provider,
       activeAccount,
       activeChainId,
+      ethereumProvider,
     }),
     [
       pairings,
@@ -337,6 +339,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
       web3Provider,
       activeAccount,
       activeChainId,
+      ethereumProvider,
     ],
   );
 
