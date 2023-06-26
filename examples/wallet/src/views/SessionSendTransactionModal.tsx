@@ -4,10 +4,7 @@ import RequesDetailsCard from "@/components/RequestDetalilsCard";
 import RequestMethodCard from "@/components/RequestMethodCard";
 import RequestModalContainer from "@/components/RequestModalContainer";
 import ModalStore from "@/store/ModalStore";
-import {
-  approveEIP155Request,
-  rejectEIP155Request,
-} from "@/utils/EIP155RequestHandlerUtil";
+import { approveEIP155Request, rejectEIP155Request } from "@/utils/EIP155RequestHandlerUtil";
 import { web3wallet } from "@/utils/WalletConnectUtil";
 import { ErrorResponse } from "@json-rpc-tools/utils";
 import { Button, Divider, Loading, Modal, Text } from "@nextui-org/react";
@@ -30,7 +27,7 @@ export default function SessionSendTransactionModal() {
 
   const { topic, params } = requestEvent;
   const { request, chainId } = params;
-  const transaction = request.params[0];
+  const transaction = (request.params as unknown[])[0] as Record<string, unknown>;
 
   // Handle approve action (logic varies based on request method)
   async function onApprove() {
@@ -67,10 +64,7 @@ export default function SessionSendTransactionModal() {
 
         <Divider y={2} />
 
-        <RequesDetailsCard
-          chains={[chainId ?? ""]}
-          protocol={requestSession.relay.protocol}
-        />
+        <RequesDetailsCard chains={[chainId ?? ""]} protocol={requestSession.relay.protocol} />
 
         <Divider y={2} />
 
@@ -81,13 +75,7 @@ export default function SessionSendTransactionModal() {
         <Button auto flat color="error" onPress={onReject} disabled={loading}>
           Reject
         </Button>
-        <Button
-          auto
-          flat
-          color="success"
-          onPress={onApprove}
-          disabled={loading}
-        >
+        <Button auto flat color="success" onPress={onApprove} disabled={loading}>
           {loading ? <Loading size="sm" color="success" /> : "Approve"}
         </Button>
       </Modal.Footer>

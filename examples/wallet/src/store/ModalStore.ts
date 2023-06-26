@@ -6,8 +6,8 @@ import { proxy } from "valtio";
  * Types
  */
 interface ModalData {
-  proposal?: SignClientTypes.EventArguments["session_proposal"];
-  requestEvent?: SignClientTypes.EventArguments["session_request"];
+  proposal?: SingleEthereumTypes.EventArguments["session_proposal"];
+  requestEvent?: SingleEthereumTypes.EventArguments["session_request"];
   requestSession?: SessionTypes.Struct;
   authRequest?: SingleEthereumTypes.AuthRequest;
 }
