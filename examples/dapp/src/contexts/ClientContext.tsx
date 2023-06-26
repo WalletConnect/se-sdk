@@ -165,6 +165,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
         ],
         showQrModal: true,
         optionalChains: Object.keys(EIP155Metadata).map((k) => parseInt(k, 10)),
+        optionalMethods: ["wallet_switchEthereumChain"],
       });
       setEthereumProvider(provider);
       setClient(provider.signer.client);
