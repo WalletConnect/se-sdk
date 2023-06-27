@@ -61,7 +61,7 @@ export class Engine extends ISingleEthereumEngine {
       },
     };
 
-    const optionalMethods = proposal.optionalNamespaces[EVM_IDENTIFIER]?.methods;
+    const optionalMethods = proposal.optionalNamespaces?.[EVM_IDENTIFIER]?.methods;
     if (optionalMethods) {
       approveParams.namespaces[EVM_IDENTIFIER].methods = approveParams.namespaces[
         EVM_IDENTIFIER
