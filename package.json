@@ -33,7 +33,7 @@
     "install:all": "yarn && cd ./examples/dapp && yarn && cd ./../wallet && yarn"
   },
   "dependencies": {
-    "@walletconnect/web3wallet": "1.8.2"
+    "@walletconnect/web3wallet": "1.8.5"
   },
   "devDependencies": {
     "@ethersproject/wallet": "^5.7.0",
