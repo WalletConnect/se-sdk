@@ -20,6 +20,11 @@ import {
 export class Engine extends ISingleEthereumEngine {
   public web3wallet: IWeb3Wallet;
   public chainId?: number;
+  private pendingInternalRequests: {
+    id: number;
+    resolve: <T>(value?: T | PromiseLike<T>) => void;
+    reject: <T>(value?: T | PromiseLike<T>) => void;
+  }[] = [];
 
   constructor(client: ISingleEthereumEngine["client"]) {
     super(client);
@@ -125,7 +130,7 @@ export class Engine extends ISingleEthereumEngine {
 
   public approveRequest: ISingleEthereumEngine["approveRequest"] = async (params) => {
     const { topic, id, result } = params;
-
+    if (this.shouldHandleInternalRequest(id, true)) return;
     const response = result.jsonrpc ? result : formatJsonRpcResult(id, result);
     return await this.web3wallet.respondSessionRequest({
       topic,
@@ -135,6 +140,7 @@ export class Engine extends ISingleEthereumEngine {
 
   public rejectRequest: ISingleEthereumEngine["rejectRequest"] = async (params) => {
     const { topic, id, error } = params;
+    if (this.shouldHandleInternalRequest(id, false)) return;
     return await this.web3wallet.respondSessionRequest({
       topic,
       response: formatJsonRpcError(id, error),
@@ -204,8 +210,18 @@ export class Engine extends ISingleEthereumEngine {
 
   // ---------- Private ----------------------------------------------- //
 
-  private onSessionRequest = (event: SingleEthereumTypes.SessionRequest) => {
+  private onSessionRequest = async (event: SingleEthereumTypes.SessionRequest) => {
     event.params.chainId = parseChain(event.params.chainId);
+
+    if (parseInt(event.params.chainId) !== this.chainId) {
+      this.client.logger.info(
+        `Session request chainId ${event.params.chainId} does not match current chainId ${this.chainId}. Attempting to switch`,
+      );
+      await this.switchEthereumChain(parseInt(event.params.chainId), event.topic).catch((e) => {
+        this.client.logger.warn(e);
+      });
+    }
+
     this.client.events.emit("session_request", event);
   };
 
@@ -278,5 +294,45 @@ export class Engine extends ISingleEthereumEngine {
       },
       chainId: prefixChainWithNamespace(chainId),
     });
+  };
+
+  private switchEthereumChain = async (chainId: number, topic: string) => {
+    let requestResolve: <T>(value?: T | PromiseLike<T>) => void;
+    let requestReject: <T>(value?: T | PromiseLike<T>) => void;
+    await new Promise((resolve, reject) => {
+      requestResolve = resolve;
+      requestReject = reject;
+      const reqId = this.pendingInternalRequests.length + 1;
+      this.pendingInternalRequests.push({
+        id: reqId,
+        resolve: requestResolve,
+        reject: requestReject,
+      });
+      this.client.events.emit("session_request", {
+        id: reqId,
+        topic,
+        params: {
+          request: {
+            method: "wallet_switchEthereumChain",
+            params: [
+              {
+                chainId,
+              },
+            ],
+          },
+          chainId,
+        },
+      });
+    });
+    this.chainId = chainId;
+  };
+
+  private shouldHandleInternalRequest = (id: number, isSuccess: boolean) => {
+    const internalRequest = this.pendingInternalRequests.find((r) => r.id === id);
+    if (internalRequest) {
+      this.pendingInternalRequests = this.pendingInternalRequests.filter((r) => r.id !== id);
+      isSuccess ? internalRequest.resolve() : internalRequest.reject();
+    }
+    return !!internalRequest;
   };
 }
