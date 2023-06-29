@@ -131,7 +131,7 @@ export class Engine extends ISingleEthereumEngine {
   public approveRequest: ISingleEthereumEngine["approveRequest"] = async (params) => {
     const { topic, id, result } = params;
     if (this.shouldHandleInternalRequest(id, true)) return;
-    const response = result.jsonrpc ? result : formatJsonRpcResult(id, result);
+    const response = result?.jsonrpc ? result : formatJsonRpcResult(id, result);
     return await this.web3wallet.respondSessionRequest({
       topic,
       response,
