@@ -17,6 +17,7 @@ import type Client from "@walletconnect/sign-client";
 import { DEFAULT_PROJECT_ID } from "../constants";
 import { providers, utils } from "ethers";
 import { AccountBalances, ChainNamespaces, getAllChainNamespaces } from "../helpers";
+import { EIP155Metadata } from "../chains/eip155";
 /**
  * Types
  */
@@ -35,6 +36,7 @@ interface IContext {
   web3Provider?: providers.Web3Provider;
   activeAccount: string;
   activeChainId: number;
+  ethereumProvider?: IEthereumProvider;
 }
 
 /**
@@ -162,6 +164,8 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
           "eth_signTypedData",
         ],
         showQrModal: true,
+        optionalChains: Object.keys(EIP155Metadata).map((k) => parseInt(k, 10)),
+        optionalMethods: ["wallet_switchEthereumChain"],
       });
       setEthereumProvider(provider);
       setClient(provider.signer.client);
@@ -321,6 +325,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
       web3Provider,
       activeAccount,
       activeChainId,
+      ethereumProvider,
     }),
     [
       pairings,
@@ -337,6 +342,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
       web3Provider,
       activeAccount,
       activeChainId,
+      ethereumProvider,
     ],
   );
 

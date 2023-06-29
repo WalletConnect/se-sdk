@@ -64,6 +64,7 @@ const Home: NextPage = () => {
     web3Provider,
     activeAccount,
     activeChainId,
+    ethereumProvider,
   } = useWalletConnectClient();
 
   const verifyEip155MessageSignature = (message: string, signature: string, address: string) =>
@@ -189,8 +190,8 @@ const Home: NextPage = () => {
     if (!web3Provider) {
       throw new Error("web3Provider not connected");
     }
-
-    const message = JSON.stringify(eip712.example);
+    const eip712Obj = eip712(ethereumProvider?.chainId || 1);
+    const message = JSON.stringify(eip712Obj);
 
     const address = activeAccount;
 
@@ -203,12 +204,11 @@ const Home: NextPage = () => {
     // Separate `EIP712Domain` type from remaining types to verify, otherwise `ethers.utils.verifyTypedData`
     // will throw due to "unused" `EIP712Domain` type.
     // See: https://github.com/ethers-io/ethers.js/issues/687#issuecomment-714069471
-    const { EIP712Domain, ...nonDomainTypes }: Record<string, TypedDataField[]> =
-      eip712.example.types;
+    const { EIP712Domain, ...nonDomainTypes }: Record<string, TypedDataField[]> = eip712Obj.types;
 
     const valid =
       utils
-        .verifyTypedData(eip712.example.domain, nonDomainTypes, eip712.example.message, signature)
+        .verifyTypedData(eip712Obj.domain, nonDomainTypes, eip712Obj.message, signature)
         .toLowerCase() === address.toLowerCase();
     return {
       method: "eth_signTypedData",
@@ -319,7 +319,12 @@ const Home: NextPage = () => {
   return (
     <SLayout>
       <Column maxWidth={1000} spanHeight>
-        <Header ping={onPing} disconnect={disconnect} session={session} />
+        <Header
+          ping={onPing}
+          disconnect={disconnect}
+          session={session}
+          ethereumProvider={ethereumProvider}
+        />
         <SContent>{isInitializing ? "Loading..." : renderContent()}</SContent>
       </Column>
       <Modal show={!!modal} closeModal={closeModal}>
