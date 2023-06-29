@@ -217,7 +217,7 @@ export class Engine extends ISingleEthereumEngine {
       this.client.logger.info(
         `Session request chainId ${event.params.chainId} does not match current chainId ${this.chainId}. Attempting to switch`,
       );
-      await this.switchEthereumChain(parseInt(event.params.chainId), event.topic).catch((e) => {
+      await this.switchEthereumChain(event).catch((e) => {
         this.client.logger.warn(e);
       });
     }
@@ -296,7 +296,14 @@ export class Engine extends ISingleEthereumEngine {
     });
   };
 
-  private switchEthereumChain = async (chainId: number, topic: string) => {
+  private switchEthereumChain = async (event: SingleEthereumTypes.SessionRequest) => {
+    const { topic, params } = event;
+    const chainId = parseInt(params.chainId);
+
+    // return early if the request is to switch to the current chain
+    if (["wallet_switchEthereumChain", "wallet_addEthereumChain"].includes(params.request.method))
+      return;
+
     let requestResolve: <T>(value?: T | PromiseLike<T>) => void;
     let requestReject: <T>(value?: T | PromiseLike<T>) => void;
     await new Promise((resolve, reject) => {
