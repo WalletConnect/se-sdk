@@ -260,6 +260,174 @@ describe("Sign Integration", () => {
     ]);
   });
 
+  it("should request wallet_switchEthereumChain to session request in different chain", async () => {
+    // first pair and approve session
+    await Promise.all([
+      new Promise((resolve) => {
+        wallet.on("session_proposal", async (sessionProposal) => {
+          const { id, params } = sessionProposal;
+          session = await wallet.approveSession({
+            id,
+            chainId: TEST_ETHEREUM_CHAIN_PARSED,
+            accounts: [cryptoWallet.address],
+          });
+          resolve(session);
+        });
+      }),
+      sessionApproval(),
+      wallet.pair({ uri: uriString }),
+    ]);
+    const originalChainId = wallet.engine.chainId;
+    const expectedChainId = 5;
+
+    expect(originalChainId).to.not.eq(expectedChainId);
+
+    // change chainId
+    wallet.engine.chainId = expectedChainId;
+
+    await Promise.all([
+      new Promise<void>((resolve) => {
+        wallet.on("session_request", async (sessionRequest) => {
+          const { id, params, topic, verifyContext } = sessionRequest;
+          if (params.request.method === "wallet_switchEthereumChain") {
+            expect(wallet.engine.chainId).to.eq(expectedChainId);
+            await wallet.approveRequest({
+              id,
+              topic: session.topic,
+              result: null,
+            });
+            resolve();
+          }
+        });
+        wallet.on("session_request", async (sessionRequest) => {
+          const { id, params, verifyContext } = sessionRequest;
+          if (params.request.method === "wallet_switchEthereumChain") return;
+          expect(verifyContext).to.be.exist;
+          expect(verifyContext.verified.validation).to.eq("UNKNOWN");
+          const requestParams = params.request.params as TransactionRequest[];
+          const signTransaction = requestParams[0];
+          const signature = await cryptoWallet.signTransaction(signTransaction);
+          const response = await wallet.approveRequest({
+            id,
+            topic: session.topic,
+            result: signature,
+          });
+          resolve(response);
+        });
+      }),
+      new Promise<void>(async (resolve) => {
+        const result = await dapp.request({
+          topic: session.topic,
+          request: {
+            method: "eth_signTransaction",
+            params: [
+              {
+                from: cryptoWallet.address,
+                to: cryptoWallet.address,
+                data: "0x",
+                nonce: "0x01",
+                gasPrice: "0x020a7ac094",
+                gasLimit: "0x5208",
+                value: "0x00",
+              },
+            ],
+          },
+          chainId: TEST_ETHEREUM_CHAIN,
+        });
+        expect(result).to.be.exist;
+        expect(result).to.be.a("string");
+        resolve();
+      }),
+    ]);
+    expect(wallet.engine.chainId).to.eq(originalChainId);
+  });
+
+  it("should handle reject to session request in different chain", async () => {
+    // first pair and approve session
+    await Promise.all([
+      new Promise((resolve) => {
+        wallet.on("session_proposal", async (sessionProposal) => {
+          const { id, params } = sessionProposal;
+          session = await wallet.approveSession({
+            id,
+            chainId: TEST_ETHEREUM_CHAIN_PARSED,
+            accounts: [cryptoWallet.address],
+          });
+          resolve(session);
+        });
+      }),
+      sessionApproval(),
+      wallet.pair({ uri: uriString }),
+    ]);
+    const originalChainId = wallet.engine.chainId;
+    const expectedChainId = 5;
+
+    expect(originalChainId).to.not.eq(expectedChainId);
+
+    // change chainId
+    wallet.engine.chainId = expectedChainId;
+
+    await Promise.all([
+      new Promise<void>((resolve) => {
+        wallet.on("session_request", async (sessionRequest) => {
+          const { id, params } = sessionRequest;
+          if (params.request.method === "wallet_switchEthereumChain") {
+            expect(wallet.engine.chainId).to.eq(expectedChainId);
+            await wallet.rejectRequest({
+              id,
+              topic: session.topic,
+              error: {
+                message: "User rejected to switch chain",
+                code: 500,
+              },
+            });
+            resolve();
+          }
+        });
+        wallet.on("session_request", async (sessionRequest) => {
+          const { id, params, verifyContext } = sessionRequest;
+          if (params.request.method === "wallet_switchEthereumChain") return;
+          expect(verifyContext).to.be.exist;
+          expect(verifyContext.verified.validation).to.eq("UNKNOWN");
+          const requestParams = params.request.params as TransactionRequest[];
+          const signTransaction = requestParams[0];
+          const signature = await cryptoWallet.signTransaction(signTransaction);
+          const response = await wallet.approveRequest({
+            id,
+            topic: session.topic,
+            result: signature,
+          });
+          resolve(response);
+        });
+      }),
+      new Promise<void>(async (resolve) => {
+        const result = await dapp.request({
+          topic: session.topic,
+          request: {
+            method: "eth_signTransaction",
+            params: [
+              {
+                from: cryptoWallet.address,
+                to: cryptoWallet.address,
+                data: "0x",
+                nonce: "0x01",
+                gasPrice: "0x020a7ac094",
+                gasLimit: "0x5208",
+                value: "0x00",
+              },
+            ],
+          },
+          chainId: TEST_ETHEREUM_CHAIN,
+        });
+        expect(result).to.be.exist;
+        expect(result).to.be.a("string");
+        resolve();
+      }),
+    ]);
+    // chain was not updated so should stay the same
+    expect(wallet.engine.chainId).to.eq(expectedChainId);
+  });
+
   it("should disconnect from session", async () => {
     // first pair and approve session
     await Promise.all([
