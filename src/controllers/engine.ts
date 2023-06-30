@@ -1,7 +1,7 @@
 import { formatJsonRpcError, formatJsonRpcResult } from "@walletconnect/jsonrpc-utils";
 import { getSdkError } from "@walletconnect/utils";
 import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet";
-import { EVM_IDENTIFIER } from "../constants";
+import { EVM_IDENTIFIER, SWITCH_CHAIN_METHODS } from "../constants";
 import { ISingleEthereumEngine, SingleEthereumTypes } from "../types";
 import {
   validateProposalNamespaces,
@@ -213,7 +213,7 @@ export class Engine extends ISingleEthereumEngine {
   private onSessionRequest = async (event: SingleEthereumTypes.SessionRequest) => {
     event.params.chainId = parseChain(event.params.chainId);
 
-    if (parseInt(event.params.chainId) !== this.chainId) {
+    if (parseInt(event.params.chainId) !== this.chainId || this.isSwitchChainRequest(event)) {
       this.client.logger.info(
         `Session request chainId ${event.params.chainId} does not match current chainId ${this.chainId}. Attempting to switch`,
       );
@@ -222,7 +222,7 @@ export class Engine extends ISingleEthereumEngine {
       });
     }
 
-    this.client.events.emit("session_request", event);
+    setTimeout(() => this.client.events.emit("session_request", event), 1_000);
   };
 
   private onSessionProposal = (event: SingleEthereumTypes.SessionProposal) => {
@@ -301,8 +301,7 @@ export class Engine extends ISingleEthereumEngine {
     const chainId = parseInt(params.chainId);
 
     // return early if the request is to switch to the current chain
-    if (["wallet_switchEthereumChain", "wallet_addEthereumChain"].includes(params.request.method))
-      return;
+    if (this.isSwitchChainRequest(event)) return;
 
     let requestResolve: <T>(value?: T | PromiseLike<T>) => void;
     let requestReject: <T>(value?: T | PromiseLike<T>) => void;
@@ -342,4 +341,17 @@ export class Engine extends ISingleEthereumEngine {
     }
     return !!internalRequest;
   };
+
+  private isSwitchChainRequest(event: SingleEthereumTypes.SessionRequest) {
+    try {
+      const chainId = parseInt((event.params.request?.params as any[])?.[0].chainId);
+      return (
+        SWITCH_CHAIN_METHODS.includes(event.params.request.method) ||
+        (chainId && chainId !== this.chainId)
+      );
+    } catch (e) {
+      this.client.logger.warn(e);
+    }
+    return false;
+  }
 }
