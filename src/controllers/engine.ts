@@ -130,7 +130,7 @@ export class Engine extends ISingleEthereumEngine {
 
   public approveRequest: ISingleEthereumEngine["approveRequest"] = async (params) => {
     const { topic, id, result } = params;
-    if (this.shouldHandleInternalRequest(id, true)) return;
+    if (this.shouldHandlePendingInternalRequest(id, true)) return;
     const response = result?.jsonrpc ? result : formatJsonRpcResult(id, result);
     return await this.web3wallet.respondSessionRequest({
       topic,
@@ -140,7 +140,7 @@ export class Engine extends ISingleEthereumEngine {
 
   public rejectRequest: ISingleEthereumEngine["rejectRequest"] = async (params) => {
     const { topic, id, error } = params;
-    if (this.shouldHandleInternalRequest(id, false)) return;
+    if (this.shouldHandlePendingInternalRequest(id, false)) return;
     return await this.web3wallet.respondSessionRequest({
       topic,
       response: formatJsonRpcError(id, error),
@@ -333,7 +333,7 @@ export class Engine extends ISingleEthereumEngine {
     this.chainId = chainId;
   };
 
-  private shouldHandleInternalRequest = (id: number, isSuccess: boolean) => {
+  private shouldHandlePendingInternalRequest = (id: number, isSuccess: boolean) => {
     const internalRequest = this.pendingInternalRequests.find((r) => r.id === id);
     if (internalRequest) {
       this.pendingInternalRequests = this.pendingInternalRequests.filter((r) => r.id !== id);
