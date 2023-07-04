@@ -23,7 +23,7 @@ import {
   TEST_REQUIRED_NAMESPACES_FAIL_NAMESPACES,
   TEST_UPDATED_NAMESPACES,
 } from "./shared";
-import { prefixChainWithNamespace } from "../src/utils";
+import { parseChain, prefixChainWithNamespace } from "../src/utils";
 
 describe("Sign Integration", () => {
   let core: ICore;
@@ -657,6 +657,44 @@ describe("Sign Integration", () => {
           resolve();
         });
       }),
+      wallet.pair({ uri: uriString }),
+    ]);
+    [dapp, wallet].forEach(async (client) => {
+      await disconnect(client.core);
+    });
+  });
+  it("should approve proposal with only optional EIP155 chain", async () => {
+    const core = new Core(TEST_CORE_OPTIONS);
+    const dapp = await SignClient.init({
+      ...TEST_CORE_OPTIONS,
+      name: "Dapp",
+    });
+    const { uri, approval } = await dapp.connect({
+      optionalNamespaces: TEST_OPTIONAL_NAMESPACES,
+    });
+    const uriString = uri || "";
+    const wallet = await SingleEthereum.init({
+      core,
+      name: "wallet",
+      metadata: {} as any,
+    });
+    await Promise.all([
+      new Promise<void>((resolve) => {
+        wallet.on("session_proposal", async (proposal) => {
+          expect(proposal).to.be.exist;
+          expect(proposal.params.optionalNamespaces).to.be.exist;
+          expect(proposal.params.optionalNamespaces.eip155).to.be.exist;
+          expect(proposal.params.optionalNamespaces.eip155.chains).to.eql([
+            parseChain(TEST_OPTIONAL_NAMESPACES.eip155.chains[0]),
+          ]);
+          await wallet.approveSession({
+            id: proposal.id,
+            ...TEST_APPROVE_PARAMS,
+          });
+          resolve();
+        });
+      }),
+      approval(),
       wallet.pair({ uri: uriString }),
     ]);
     [dapp, wallet].forEach(async (client) => {
