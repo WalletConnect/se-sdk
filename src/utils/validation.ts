@@ -1,4 +1,5 @@
 import { ProposalTypes, SessionTypes } from "@walletconnect/types";
+import { normalizeNamespaces } from "@walletconnect/utils";
 import { EVM_IDENTIFIER } from "../constants";
 import { prefixChainWithNamespace } from "./transform";
 
@@ -12,16 +13,18 @@ export const validateProposalNamespaces = (proposal: ProposalTypes.Struct) => {
 };
 
 export const validateProposalChains = (proposal: ProposalTypes.Struct) => {
-  const eip155 = proposal.requiredNamespaces[EVM_IDENTIFIER];
-  const eip155Chains = eip155 && eip155.chains;
+  const normalizedRequired = normalizeNamespaces(proposal.requiredNamespaces);
+  const normalizedOptional = normalizeNamespaces(proposal.optionalNamespaces);
+  const requiredEip155 = normalizedRequired[EVM_IDENTIFIER]?.chains || [];
+  const optionalEip155 = normalizedOptional[EVM_IDENTIFIER]?.chains || [];
+  const proposedChains = [...requiredEip155, ...optionalEip155];
 
-  if (
-    // if the proposal contains more than one EVM chain
-    !eip155 ||
-    !eip155Chains ||
-    eip155Chains.length > 1
-  ) {
-    throw new Error("Invalid Session Chains. Proposed either no `eip155` chains or more than one.");
+  if (requiredEip155.length > 1) {
+    throw new Error("Invalid Session Proposal. More than one required `eip155` chain is proposed.");
+  }
+
+  if (!proposedChains.length) {
+    throw new Error("Invalid Session Proposal. No `eip155` chain is proposed.");
   }
 };
 

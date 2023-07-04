@@ -1,5 +1,5 @@
 import { formatJsonRpcError, formatJsonRpcResult } from "@walletconnect/jsonrpc-utils";
-import { getSdkError } from "@walletconnect/utils";
+import { getSdkError, normalizeNamespaces } from "@walletconnect/utils";
 import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet";
 import { EVM_IDENTIFIER, SWITCH_CHAIN_METHODS } from "../constants";
 import { ISingleEthereumEngine, SingleEthereumTypes } from "../types";
@@ -47,7 +47,9 @@ export class Engine extends ISingleEthereumEngine {
   public approveSession: ISingleEthereumEngine["approveSession"] = async (params) => {
     const { id, chainId, accounts } = params;
     const proposal = this.web3wallet.engine.signClient.proposal.get(id);
-    const requiredChain = proposal.requiredNamespaces[EVM_IDENTIFIER].chains?.[0];
+    const normalizedRequired = normalizeNamespaces(proposal.requiredNamespaces);
+    const normalizedOptional = normalizeNamespaces(proposal.optionalNamespaces);
+    const requiredChain = normalizedRequired[EVM_IDENTIFIER]?.chains?.[0];
     const requiredParsed = requiredChain ? parseInt(parseChain(requiredChain)) : chainId;
     const approvedChains = [requiredParsed];
 
@@ -59,14 +61,16 @@ export class Engine extends ISingleEthereumEngine {
       id,
       namespaces: {
         [EVM_IDENTIFIER]: {
-          ...proposal.requiredNamespaces[EVM_IDENTIFIER],
+          ...normalizedRequired[EVM_IDENTIFIER],
           accounts: approvedChains.map((chain) => formatAccounts(accounts, chain)).flat(),
           chains: approvedChains.map((chain) => prefixChainWithNamespace(chain)),
+          methods: normalizedRequired[EVM_IDENTIFIER]?.methods || [],
+          events: normalizedRequired[EVM_IDENTIFIER]?.events || [],
         },
       },
     };
 
-    const optionalMethods = proposal.optionalNamespaces?.[EVM_IDENTIFIER]?.methods;
+    const optionalMethods = normalizedOptional[EVM_IDENTIFIER]?.methods;
     if (optionalMethods) {
       approveParams.namespaces[EVM_IDENTIFIER].methods = approveParams.namespaces[
         EVM_IDENTIFIER
