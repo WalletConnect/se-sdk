@@ -14,7 +14,7 @@ export default function SwitchChainModal() {
   // Get request and wallet data from store
   const requestEvent = ModalStore.state.data?.requestEvent;
   const requestSession = ModalStore.state.data?.requestSession;
-  const { account } = useSnapshot(SettingsStore.state);
+  const { account, activeChainId } = useSnapshot(SettingsStore.state);
   // Ensure request and wallet are defined
   if (!requestEvent || !requestSession) {
     return <Text>Missing request data</Text>;
