@@ -334,7 +334,7 @@ export class Engine extends ISingleEthereumEngine {
               },
             ],
           },
-          chainId,
+          chainId: this.chainId,
         },
         verifyContext: {
           verified: {
