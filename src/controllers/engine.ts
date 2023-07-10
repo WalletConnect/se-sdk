@@ -330,11 +330,18 @@ export class Engine extends ISingleEthereumEngine {
             method: "wallet_switchEthereumChain",
             params: [
               {
-                chainId,
+                chainId: `0x${chainId.toString(16)}`,
               },
             ],
           },
           chainId,
+        },
+        verifyContext: {
+          verified: {
+            verifyUrl: "",
+            validation: "UNKNOWN",
+            origin: "",
+          },
         },
       });
     });
