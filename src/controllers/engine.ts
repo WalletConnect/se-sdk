@@ -323,7 +323,7 @@ export class Engine extends ISingleEthereumEngine {
         reject: requestReject,
       });
       this.client.events.emit("session_request", {
-        id: `${reqId}`,
+        id: reqId,
         topic,
         params: {
           request: {
@@ -334,7 +334,7 @@ export class Engine extends ISingleEthereumEngine {
               },
             ],
           },
-          chainId: this.chainId,
+          chainId: `${this.chainId}`,
         },
         verifyContext: {
           verified: {
