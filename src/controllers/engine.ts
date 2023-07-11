@@ -1,7 +1,7 @@
 import { formatJsonRpcError, formatJsonRpcResult } from "@walletconnect/jsonrpc-utils";
-import { getSdkError } from "@walletconnect/utils";
+import { getSdkError, normalizeNamespaces } from "@walletconnect/utils";
 import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet";
-import { EVM_IDENTIFIER } from "../constants";
+import { EVM_IDENTIFIER, SWITCH_CHAIN_METHODS } from "../constants";
 import { ISingleEthereumEngine, SingleEthereumTypes } from "../types";
 import {
   validateProposalNamespaces,
@@ -20,6 +20,11 @@ import {
 export class Engine extends ISingleEthereumEngine {
   public web3wallet: IWeb3Wallet;
   public chainId?: number;
+  private pendingInternalRequests: {
+    id: number;
+    resolve: <T>(value?: T | PromiseLike<T>) => void;
+    reject: <T>(value?: T | PromiseLike<T>) => void;
+  }[] = [];
 
   constructor(client: ISingleEthereumEngine["client"]) {
     super(client);
@@ -42,7 +47,9 @@ export class Engine extends ISingleEthereumEngine {
   public approveSession: ISingleEthereumEngine["approveSession"] = async (params) => {
     const { id, chainId, accounts } = params;
     const proposal = this.web3wallet.engine.signClient.proposal.get(id);
-    const requiredChain = proposal.requiredNamespaces[EVM_IDENTIFIER].chains?.[0];
+    const normalizedRequired = normalizeNamespaces(proposal.requiredNamespaces);
+    const normalizedOptional = normalizeNamespaces(proposal.optionalNamespaces);
+    const requiredChain = normalizedRequired[EVM_IDENTIFIER]?.chains?.[0];
     const requiredParsed = requiredChain ? parseInt(parseChain(requiredChain)) : chainId;
     const approvedChains = [requiredParsed];
 
@@ -54,14 +61,20 @@ export class Engine extends ISingleEthereumEngine {
       id,
       namespaces: {
         [EVM_IDENTIFIER]: {
-          ...proposal.requiredNamespaces[EVM_IDENTIFIER],
+          ...normalizedRequired[EVM_IDENTIFIER],
           accounts: approvedChains.map((chain) => formatAccounts(accounts, chain)).flat(),
           chains: approvedChains.map((chain) => prefixChainWithNamespace(chain)),
+          methods: normalizedRequired[EVM_IDENTIFIER]?.methods?.length
+            ? normalizedRequired[EVM_IDENTIFIER].methods
+            : ["eth_sendTransaction", "personal_sign"],
+          events: normalizedRequired[EVM_IDENTIFIER]?.events?.length
+            ? normalizedRequired[EVM_IDENTIFIER].events
+            : ["chainChanged", "accountsChanged"],
         },
       },
     };
 
-    const optionalMethods = proposal.optionalNamespaces?.[EVM_IDENTIFIER]?.methods;
+    const optionalMethods = normalizedOptional[EVM_IDENTIFIER]?.methods;
     if (optionalMethods) {
       approveParams.namespaces[EVM_IDENTIFIER].methods = approveParams.namespaces[
         EVM_IDENTIFIER
@@ -125,8 +138,8 @@ export class Engine extends ISingleEthereumEngine {
 
   public approveRequest: ISingleEthereumEngine["approveRequest"] = async (params) => {
     const { topic, id, result } = params;
-
-    const response = result.jsonrpc ? result : formatJsonRpcResult(id, result);
+    if (this.shouldHandlePendingInternalRequest(id, true)) return;
+    const response = result?.jsonrpc ? result : formatJsonRpcResult(id, result);
     return await this.web3wallet.respondSessionRequest({
       topic,
       response,
@@ -135,6 +148,7 @@ export class Engine extends ISingleEthereumEngine {
 
   public rejectRequest: ISingleEthereumEngine["rejectRequest"] = async (params) => {
     const { topic, id, error } = params;
+    if (this.shouldHandlePendingInternalRequest(id, false)) return;
     return await this.web3wallet.respondSessionRequest({
       topic,
       response: formatJsonRpcError(id, error),
@@ -204,9 +218,19 @@ export class Engine extends ISingleEthereumEngine {
 
   // ---------- Private ----------------------------------------------- //
 
-  private onSessionRequest = (event: SingleEthereumTypes.SessionRequest) => {
+  private onSessionRequest = async (event: SingleEthereumTypes.SessionRequest) => {
     event.params.chainId = parseChain(event.params.chainId);
-    this.client.events.emit("session_request", event);
+
+    if (parseInt(event.params.chainId) !== this.chainId || this.isSwitchChainRequest(event)) {
+      this.client.logger.info(
+        `Session request chainId ${event.params.chainId} does not match current chainId ${this.chainId}. Attempting to switch`,
+      );
+      await this.switchEthereumChain(event).catch((e) => {
+        this.client.logger.warn(e);
+      });
+    }
+    // delay session request to allow for chain switch to complete
+    setTimeout(() => this.client.events.emit("session_request", event), 1_000);
   };
 
   private onSessionProposal = (event: SingleEthereumTypes.SessionProposal) => {
@@ -279,4 +303,70 @@ export class Engine extends ISingleEthereumEngine {
       chainId: prefixChainWithNamespace(chainId),
     });
   };
+
+  private switchEthereumChain = async (event: SingleEthereumTypes.SessionRequest) => {
+    const { topic, params } = event;
+    const chainId = parseInt(params.chainId);
+
+    // return early if the request is to switch to the current chain
+    if (this.isSwitchChainRequest(event)) return;
+
+    let requestResolve: <T>(value?: T | PromiseLike<T>) => void;
+    let requestReject: <T>(value?: T | PromiseLike<T>) => void;
+    await new Promise((resolve, reject) => {
+      requestResolve = resolve;
+      requestReject = reject;
+      const reqId = this.pendingInternalRequests.length + 1;
+      this.pendingInternalRequests.push({
+        id: reqId,
+        resolve: requestResolve,
+        reject: requestReject,
+      });
+      this.client.events.emit("session_request", {
+        id: reqId,
+        topic,
+        params: {
+          request: {
+            method: "wallet_switchEthereumChain",
+            params: [
+              {
+                chainId: `0x${chainId.toString(16)}`,
+              },
+            ],
+          },
+          chainId: `${this.chainId}`,
+        },
+        verifyContext: {
+          verified: {
+            verifyUrl: "",
+            validation: "UNKNOWN",
+            origin: "",
+          },
+        },
+      });
+    });
+    this.chainId = chainId;
+  };
+
+  private shouldHandlePendingInternalRequest = (id: number, isSuccess: boolean) => {
+    const internalRequest = this.pendingInternalRequests.find((r) => r.id === id);
+    if (internalRequest) {
+      this.pendingInternalRequests = this.pendingInternalRequests.filter((r) => r.id !== id);
+      isSuccess ? internalRequest.resolve() : internalRequest.reject();
+    }
+    return !!internalRequest;
+  };
+
+  private isSwitchChainRequest(event: SingleEthereumTypes.SessionRequest) {
+    try {
+      const chainId = parseInt((event.params.request?.params as any[])?.[0].chainId);
+      return (
+        SWITCH_CHAIN_METHODS.includes(event.params.request.method) ||
+        (chainId && chainId !== this.chainId)
+      );
+    } catch (e) {
+      this.client.logger.warn(e);
+    }
+    return false;
+  }
 }

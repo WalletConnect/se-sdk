@@ -55,7 +55,11 @@ export default function useWalletConnectEventsManager() {
             requestEvent,
             requestSession,
           });
-
+        case EIP155_SIGNING_METHODS.WALLET_SWITCH_ETHEREUM_CHAIN:
+          return ModalStore.open("SwitchChainModal", {
+            requestEvent,
+            requestSession,
+          });
         default:
           return ModalStore.open("SessionUnsuportedMethodModal", {
             requestEvent,

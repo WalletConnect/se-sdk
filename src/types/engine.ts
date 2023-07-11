@@ -4,6 +4,7 @@ import { IWeb3Wallet } from "@walletconnect/web3wallet";
 import { ISingleEthereum, SingleEthereumTypes } from "./client";
 export abstract class ISingleEthereumEngine {
   public abstract web3wallet: IWeb3Wallet;
+  public abstract chainId?: number;
 
   constructor(public client: ISingleEthereum) {}
   // ---------- Public Methods ------------------------------------------------- //

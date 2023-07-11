@@ -9,3 +9,5 @@ export const CLIENT_STORAGE_OPTIONS = {
 };
 
 export const EVM_IDENTIFIER = "eip155";
+
+export const SWITCH_CHAIN_METHODS = ["wallet_switchEthereumChain", "wallet_addEthereumChain"];

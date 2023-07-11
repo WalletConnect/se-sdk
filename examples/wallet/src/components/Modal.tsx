@@ -5,6 +5,7 @@ import SessionSendTransactionModal from "@/views/SessionSendTransactionModal";
 import SessionRequestModal from "@/views/SessionSignModal";
 import SessionSignTypedDataModal from "@/views/SessionSignTypedDataModal";
 import SessionUnsuportedMethodModal from "@/views/SessionUnsuportedMethodModal";
+import SwitchChainModal from "@/views/SwitchChainModal";
 import { Modal as NextModal } from "@nextui-org/react";
 import { useSnapshot } from "valtio";
 
@@ -18,6 +19,7 @@ export default function Modal() {
       {view === "SessionSignTypedDataModal" && <SessionSignTypedDataModal />}
       {view === "SessionSendTransactionModal" && <SessionSendTransactionModal />}
       {view === "SessionUnsuportedMethodModal" && <SessionUnsuportedMethodModal />}
+      {view === "SwitchChainModal" && <SwitchChainModal />}
       {view === "AuthRequestModal" && <AuthRequestModal />}
     </NextModal>
   );

@@ -43,8 +43,14 @@ export const parseSessions = (sessions: SessionTypes.Struct[]) => {
 
 export const parseProposal = (proposal: ProposalTypes.Struct) => {
   const parsedProposal = cloneObject(proposal);
-  const chains = proposal.requiredNamespaces[EVM_IDENTIFIER].chains || [];
-  parsedProposal.requiredNamespaces[EVM_IDENTIFIER].chains = parseChains(chains);
+  const chains = proposal.requiredNamespaces?.[EVM_IDENTIFIER]?.chains || [];
+  const optionalChains = proposal.optionalNamespaces?.[EVM_IDENTIFIER]?.chains || [];
+  if (parsedProposal.requiredNamespaces?.[EVM_IDENTIFIER]) {
+    parsedProposal.requiredNamespaces[EVM_IDENTIFIER].chains = parseChains(chains);
+  }
+  if (parsedProposal.optionalNamespaces?.[EVM_IDENTIFIER]) {
+    parsedProposal.optionalNamespaces[EVM_IDENTIFIER].chains = parseChains(optionalChains);
+  }
   return parsedProposal;
 };
 

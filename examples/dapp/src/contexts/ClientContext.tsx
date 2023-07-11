@@ -155,17 +155,16 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
 
       const provider = await EthereumProvider.init({
         projectId: DEFAULT_PROJECT_ID || "",
-        chains: [1],
-        methods: [
+        optionalChains: [1],
+        optionalMethods: [
           "eth_sendTransaction",
           "personal_sign",
           "eth_signTransaction",
           "eth_sign",
           "eth_signTypedData",
+          "wallet_switchEthereumChain",
         ],
         showQrModal: true,
-        optionalChains: Object.keys(EIP155Metadata).map((k) => parseInt(k, 10)),
-        optionalMethods: ["wallet_switchEthereumChain"],
       });
       setEthereumProvider(provider);
       setClient(provider.signer.client);
@@ -189,7 +188,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
 
       const chainId = (caipChainId.split(":").pop() || 1) as number;
       await ethereumProvider.connect({
-        chains: [chainId],
+        optionalChains: [chainId],
       });
 
       createWeb3Provider(ethereumProvider);
@@ -199,6 +198,7 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
       setActiveAccount(_accounts[0]);
       setActiveChainId(chainId);
       setSession(ethereumProvider.session);
+      console.log("session", ethereumProvider.session);
       setChain(caipChainId);
     },
     [ethereumProvider, createWeb3Provider],

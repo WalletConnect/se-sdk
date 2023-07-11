@@ -12,9 +12,11 @@ import { SessionTypes } from "@walletconnect/types";
 import { getSdkError } from "@walletconnect/utils";
 import { Fragment, useEffect, useState } from "react";
 import SettingsStore from "@/store/SettingsStore";
+import { useSnapshot } from "valtio";
 
 export default function SessionProposalModal() {
-  const [selectedAccounts, setSelectedAccounts] = useState<Record<string, string[]>>({});
+  const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+  const { activeChainId } = useSnapshot(SettingsStore.state);
   const hasSelected = Object.keys(selectedAccounts).length;
 
   // Get proposal data and wallet address from store
@@ -30,25 +32,18 @@ export default function SessionProposalModal() {
   const { id, params } = proposal;
 
   const { proposer, requiredNamespaces, optionalNamespaces, sessionProperties, relays } = params;
-  console.log("proposal", params, requiredNamespaces, optionalNamespaces, sessionProperties);
   const requiredNamespaceKeys = requiredNamespaces ? Object.keys(requiredNamespaces) : [];
   const optionalNamespaceKeys = optionalNamespaces ? Object.keys(optionalNamespaces) : [];
+
   const pendingProposals = web3wallet.getPendingSessionProposals();
   console.log("pendingProposals", pendingProposals);
   // Add / remove address from EIP155 selection
   function onSelectAccount(chain: string, account: string) {
-    if (selectedAccounts[chain]?.includes(account)) {
-      const newSelectedAccounts = selectedAccounts[chain]?.filter((a) => a !== account);
-      setSelectedAccounts((prev) => ({
-        ...prev,
-        [chain]: newSelectedAccounts,
-      }));
+    if (selectedAccounts?.includes(account)) {
+      const newSelectedAccounts = selectedAccounts?.filter((a) => a !== account);
+      setSelectedAccounts(newSelectedAccounts);
     } else {
-      const prevChainAddresses = selectedAccounts[chain] ?? [];
-      setSelectedAccounts((prev) => ({
-        ...prev,
-        [chain]: [...prevChainAddresses, account],
-      }));
+      setSelectedAccounts([...selectedAccounts, account]);
     }
   }
 
@@ -56,20 +51,11 @@ export default function SessionProposalModal() {
   async function onApprove() {
     if (proposal) {
       const accounts: string[] = [];
-      requiredNamespaceKeys.forEach((key) => {
-        if (requiredNamespaces[key].chains) {
-          requiredNamespaces[key].chains?.map((chain) =>
-            selectedAccounts[`required:${key}`].map((acc) => accounts.push(acc)),
-          );
-        }
-      });
-      const chainId = requiredNamespaces.eip155.chains?.[0];
-      console.log("approving", chainId, accounts);
-
+      console.log("selectedAccounts", selectedAccounts, activeChainId);
       const session = await web3wallet.approveSession({
         id,
-        chainId: parseInt(chainId || "1"),
-        accounts,
+        chainId: activeChainId,
+        accounts: selectedAccounts,
       });
 
       SettingsStore.setActiveSession(session.topic);
@@ -94,7 +80,7 @@ export default function SessionProposalModal() {
       return (
         <ProposalSelectSection
           addresses={eip155Addresses}
-          selectedAddresses={selectedAccounts[chain]}
+          selectedAddresses={selectedAccounts}
           onSelect={onSelectAccount}
           chain={chain}
         />
@@ -106,20 +92,29 @@ export default function SessionProposalModal() {
     <Fragment>
       <RequestModalContainer title="Session Proposal">
         <ProjectInfoCard metadata={proposer.metadata} />
-
         <Divider y={2} />
-
         {requiredNamespaceKeys.length ? <Text h4>Required Namespaces</Text> : null}
         {requiredNamespaceKeys.map((chain) => {
           return (
             <Fragment key={chain}>
               <Text css={{ marginBottom: "$5" }}>{`Review ${chain} permissions`}</Text>
               <SessionProposalChainCard requiredNamespace={requiredNamespaces[chain]} />
-              {renderAccountSelection(`required:${chain}`)}
               <Divider y={2} />
             </Fragment>
           );
         })}
+        {optionalNamespaceKeys.length ? <Text h4>Optional Namespaces</Text> : null}
+        {optionalNamespaceKeys.map((chain) => {
+          return (
+            <Fragment key={chain}>
+              <Text css={{ marginBottom: "$5" }}>{`Review ${chain} permissions`}</Text>
+              <SessionProposalChainCard requiredNamespace={optionalNamespaces[chain]} />
+
+              <Divider y={2} />
+            </Fragment>
+          );
+        })}
+        <Fragment>{renderAccountSelection(`eip155`)}</Fragment>
       </RequestModalContainer>
 
       <Modal.Footer>

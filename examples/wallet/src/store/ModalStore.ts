@@ -19,7 +19,8 @@ interface State {
     | "SessionSignTypedDataModal"
     | "SessionSendTransactionModal"
     | "SessionUnsuportedMethodModal"
-    | "AuthRequestModal";
+    | "AuthRequestModal"
+    | "SwitchChainModal";
   data?: ModalData;
 }
 
