@@ -229,8 +229,7 @@ export class Engine extends ISingleEthereumEngine {
         this.client.logger.warn(e);
       });
     }
-
-    setTimeout(() => this.client.events.emit("session_request", event), 1_000);
+    setTimeout(() => this.client.events.emit("session_request", event), 1_300);
   };
 
   private onSessionProposal = (event: SingleEthereumTypes.SessionProposal) => {
