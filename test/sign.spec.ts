@@ -25,14 +25,6 @@ import {
 } from "./shared";
 import { parseChain, prefixChainWithNamespace } from "../src/utils";
 
-import { defineConfig } from "vite";
-
-export default defineConfig({
-  test: {
-    testTimeout: 10000,
-  },
-});
-
 describe("Sign Integration", () => {
   let core: ICore;
   let wallet: ISingleEthereum;
