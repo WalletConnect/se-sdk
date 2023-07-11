@@ -1,5 +1,5 @@
 {
-  "exclude": ["examples", "test"],
+  "exclude": ["examples", "test", "vitest.config.ts"],
   "compilerOptions": {
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
