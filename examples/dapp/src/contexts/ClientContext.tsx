@@ -187,8 +187,12 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
       }
 
       const chainId = (caipChainId.split(":").pop() || 1) as number;
+      let allSupportedChains = Object.keys(EIP155Metadata).map((chainId) => parseInt(chainId));
+      allSupportedChains = allSupportedChains.filter((chain) => chain !== chainId);
+      allSupportedChains.unshift(chainId);
+
       await ethereumProvider.connect({
-        optionalChains: [chainId],
+        optionalChains: allSupportedChains,
       });
 
       createWeb3Provider(ethereumProvider);
