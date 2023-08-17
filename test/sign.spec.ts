@@ -59,6 +59,7 @@ describe("Sign Integration", () => {
       name: "wallet",
       metadata: {} as any,
     });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     expect(wallet).to.be.exist;
     expect(dapp).to.be.exist;
     expect(core).to.be.exist;
