@@ -30,10 +30,10 @@
   "dependencies": {
     "@ethereumjs/tx": "^3.5.0",
     "@walletconnect/encoding": "^1.0.1",
-    "@walletconnect/ethereum-provider": "2.10.4",
+    "@walletconnect/ethereum-provider": "2.11.0",
     "@walletconnect/modal": "^2.5.4",
-    "@walletconnect/types": "2.10.3",
-    "@walletconnect/utils": "2.10.3",
+    "@walletconnect/types": "2.11.0",
+    "@walletconnect/utils": "2.11.0",
     "axios": "^0.21.1",
     "blockies-ts": "^1.0.0",
     "cosmos-wallet": "^1.1.0",
