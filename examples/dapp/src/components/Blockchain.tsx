@@ -1,6 +1,5 @@
 import React, { PropsWithChildren, FC } from "react";
 import styled from "styled-components";
-import { ChainData } from "caip-api";
 
 import Asset from "./Asset";
 import Button from "./Button";
@@ -14,6 +13,7 @@ import {
   ChainMetadata,
   ChainNamespaces,
   AccountBalances,
+  NamespaceMetadata,
 } from "../helpers";
 import { fonts } from "../styles";
 
@@ -93,13 +93,13 @@ interface BlockchainProps {
 }
 
 interface BlockchainDisplayData {
-  data: ChainData;
+  data: ChainMetadata;
   meta: ChainMetadata;
 }
 
 function getBlockchainDisplayData(
   chainId: string,
-  chainData: ChainNamespaces
+  chainData: ChainNamespaces,
 ): BlockchainDisplayData | undefined {
   const [namespace, reference] = chainId.split(":");
   let meta: ChainMetadata;
@@ -108,24 +108,15 @@ function getBlockchainDisplayData(
   } catch (e) {
     return undefined;
   }
-  const data: ChainData = chainData[namespace][reference];
+  const data = chainData[namespace][reference];
   if (typeof data === "undefined") return undefined;
   return { data, meta };
 }
 
 const Blockchain: FC<PropsWithChildren<BlockchainProps>> = (
-  props: PropsWithChildren<BlockchainProps>
+  props: PropsWithChildren<BlockchainProps>,
 ) => {
-  const {
-    chainData,
-    fetching,
-    chainId,
-    address,
-    onClick,
-    balances,
-    active,
-    actions,
-  } = props;
+  const { chainData, fetching, chainId, address, onClick, balances, active, actions } = props;
 
   if (!Object.keys(chainData).length) return null;
 
@@ -162,10 +153,7 @@ const Blockchain: FC<PropsWithChildren<BlockchainProps>> = (
                 <SFullWidthContainer>
                   <h6>Balances</h6>
                   <Column center>
-                    <Asset
-                      key={balances[address].symbol}
-                      asset={balances[address]}
-                    />
+                    <Asset key={balances[address].symbol} asset={balances[address]} />
                   </Column>
                 </SFullWidthContainer>
               ) : null}

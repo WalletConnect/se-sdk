@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 
-import { apiGetChainNamespace, ChainsMap } from "caip-api";
 import { PairingTypes, SessionTypes } from "@walletconnect/types";
 import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import type IEthereumProvider from "@walletconnect/ethereum-provider";
@@ -79,20 +78,10 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
 
   const loadChainData = async () => {
     const namespaces = getAllChainNamespaces();
-    const chainData: ChainNamespaces = {};
-    await Promise.all(
-      namespaces.map(async (namespace) => {
-        let chains: ChainsMap | undefined;
-        try {
-          chains = await apiGetChainNamespace(namespace);
-        } catch (e) {
-          // ignore error
-        }
-        if (typeof chains !== "undefined") {
-          chainData[namespace] = chains;
-        }
-      }),
-    );
+    const namespace = namespaces[0];
+    const chainData = {
+      [namespace]: EIP155Metadata,
+    };
     setChainData(chainData);
   };
 
