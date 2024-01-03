@@ -14,7 +14,7 @@
     "@json-rpc-tools/utils": "1.7.6",
     "@nextui-org/react": "1.0.0-beta.12",
     "@walletconnect/core": "2.10.3",
-    "@walletconnect/se-sdk": "1.6.2-rc.0",
+    "@walletconnect/se-sdk": "1.7.0-rc.0",
     "@walletconnect/utils": "2.10.3",
     "ethers": "5.7.2",
     "framer-motion": "9.0.2",
