@@ -106,20 +106,25 @@ export class Engine extends ISingleEthereumEngine {
     const formattedChain = prefixChainWithNamespace(chainId);
     const formattedAccounts = formatAccounts(accounts, chainId);
     const namespaces = session.namespaces[EVM_IDENTIFIER];
+    let shouldUpdateSession = false;
     if (!chainAlreadyInSession(session, chainId)) {
       namespaces?.chains?.push(formattedChain);
+      shouldUpdateSession = true;
     }
 
     if (!accountsAlreadyInSession(session, formattedAccounts)) {
       namespaces.accounts = namespaces.accounts.concat(formattedAccounts);
+      shouldUpdateSession = true;
     }
 
-    await this.web3wallet.updateSession({
-      topic,
-      namespaces: {
-        [EVM_IDENTIFIER]: namespaces,
-      },
-    });
+    if (shouldUpdateSession) {
+      await this.web3wallet.updateSession({
+        topic,
+        namespaces: {
+          [EVM_IDENTIFIER]: namespaces,
+        },
+      });
+    }
 
     if (this.chainId !== chainId) {
       await this.changeChain(topic, chainId);
@@ -293,7 +298,6 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   private changeChain = async (topic: string, chainId: number) => {
-    await this.web3wallet.engine.signClient.ping({ topic });
     await this.web3wallet.emitSessionEvent({
       topic,
       event: {
