@@ -13,9 +13,9 @@
   "dependencies": {
     "@json-rpc-tools/utils": "1.7.6",
     "@nextui-org/react": "1.0.0-beta.12",
-    "@walletconnect/core": "2.10.3",
-    "@walletconnect/se-sdk": "1.7.0-rc.0",
-    "@walletconnect/utils": "2.10.3",
+    "@walletconnect/core": "2.11.2",
+    "@walletconnect/se-sdk": "1.7.0-canary-59e3831",
+    "@walletconnect/utils": "2.11.2",
     "ethers": "5.7.2",
     "framer-motion": "9.0.2",
     "next": "12.2.0",
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/node": "18.13.0",
     "@types/react": "18.0.28",
-    "@walletconnect/types": "2.10.3",
+    "@walletconnect/types": "2.11.2",
     "eslint": "8.34.0",
     "eslint-config-next": "13.1.6",
     "eslint-config-prettier": "8.6.0",
