@@ -20,6 +20,7 @@ import {
 export class Engine extends ISingleEthereumEngine {
   public web3wallet: IWeb3Wallet;
   public chainId?: number;
+
   private pendingInternalRequests: {
     id: number;
     resolve: <T>(value?: T | PromiseLike<T>) => void;
@@ -232,8 +233,23 @@ export class Engine extends ISingleEthereumEngine {
     return this.web3wallet.getPendingAuthRequests();
   };
 
-  public formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"] = (payload, address) => {
-    return this.web3wallet.formatMessage(payload, formatAuthAddress(address));
+  public formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"] = (params) => {
+    return this.web3wallet.engine.signClient.formatAuthMessage({
+      request: params.payload,
+      iss: params.address,
+    });
+  };
+
+  public approveSessionAuthenticate: ISingleEthereumEngine["approveSessionAuthenticate"] = async (
+    params,
+  ) => {
+    return await this.web3wallet.approveSessionAuthenticate(params);
+  };
+
+  public rejectSessionAuthenticate: ISingleEthereumEngine["rejectSessionAuthenticate"] = async (
+    params,
+  ) => {
+    return await this.web3wallet.rejectSessionAuthenticate(params);
   };
 
   // ---------- Private ----------------------------------------------- //
@@ -298,11 +314,16 @@ export class Engine extends ISingleEthereumEngine {
     this.client.events.emit("auth_request", event);
   };
 
+  private onSessionAuthenticate = (event: SingleEthereumTypes.SessionAuthenticate) => {
+    this.client.events.emit("session_authenticate", event);
+  };
+
   private initializeEventListeners = () => {
     this.web3wallet.on("session_proposal", this.onSessionProposal);
     this.web3wallet.on("session_request", this.onSessionRequest);
     this.web3wallet.on("session_delete", this.onSessionDelete);
     this.web3wallet.on("auth_request", this.onAuthRequest);
+    this.web3wallet.on("session_authenticate", this.onSessionAuthenticate);
   };
 
   private disconnectPairings = async () => {

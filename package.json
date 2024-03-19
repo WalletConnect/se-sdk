@@ -2,7 +2,7 @@
   "name": "@walletconnect/se-sdk",
   "description": "Single-Ethreum-SDK for WalletConnect Protocol",
   "private": false,
-  "version": "1.7.0",
+  "version": "1.7.0-rc-sign2.5-2",
   "author": "WalletConnect, Inc. <walletconnect.com>",
   "homepage": "https://github.com/walletconnect/walletconnect-monorepo/",
   "license": "Apache-2.0",
@@ -33,7 +33,7 @@
     "install:all": "yarn && cd ./examples/dapp && yarn && cd ./../wallet && yarn"
   },
   "dependencies": {
-    "@walletconnect/web3wallet": "1.10.2"
+    "@walletconnect/web3wallet": "1.10.2-rc-sign2.5-2"
   },
   "devDependencies": {
     "@ethersproject/wallet": "^5.7.0",
