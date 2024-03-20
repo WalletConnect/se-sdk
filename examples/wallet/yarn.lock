@@ -2066,10 +2066,10 @@
   dependencies:
     tslib "1.14.1"
 
-"@walletconnect/se-sdk@1.7.0-canary-59e3831":
-  version "1.7.0-canary-59e3831"
-  resolved "https://registry.yarnpkg.com/@walletconnect/se-sdk/-/se-sdk-1.7.0-canary-59e3831.tgz#805ec7ef15d3660214ccaadc93bcf7c8c0e65f6f"
-  integrity sha512-xE942ayz93hG5/a6eRsVsfSTdeoqUXrHLHIhBkBNdWLU7AEmwe+8cVV7mRhKxWJRz5AmQXqFCfNwqQR9/m0Mdg==
+"@walletconnect/se-sdk@1.7.0-canary-82cf156-1":
+  version "1.7.0-canary-82cf156-1"
+  resolved "https://registry.yarnpkg.com/@walletconnect/se-sdk/-/se-sdk-1.7.0-canary-82cf156-1.tgz#e8b52b29d1f32a55e9d21bf13ff6441cc9b771ea"
+  integrity sha512-3DMq5hUdIh68u9KeUEenDwkTDm4Kif2B2qscNlqqo0bp/6bM0tSlwM6XwtOgty3VOysUHhhSE4G+lJafs1TagA==
   dependencies:
     "@walletconnect/web3wallet" "1.10.2"
 

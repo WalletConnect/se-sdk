@@ -101,6 +101,10 @@ export class Engine extends ISingleEthereumEngine {
 
   public updateSession: ISingleEthereumEngine["updateSession"] = async (params) => {
     const { topic, chainId, accounts } = params;
+    if (chainId < 1) {
+      // eslint-disable-next-line no-console
+      return console.error("se-sdk, updateSession Invalid chainId", chainId);
+    }
     const session = this.web3wallet.engine.signClient.session.get(topic);
     const formattedChain = prefixChainWithNamespace(chainId);
     const formattedAccounts = formatAccounts(accounts, chainId);
