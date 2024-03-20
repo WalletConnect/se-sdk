@@ -16,6 +16,7 @@ export const EIP155Colors = {
   polygon: "130, 71, 229",
   celo: "60, 203, 132",
   arbitrum: "44, 55, 75",
+  sepolia: "189, 174, 155",
 };
 
 export const EIP155Metadata: NamespaceMetadata = {
@@ -71,6 +72,11 @@ export const EIP155Metadata: NamespaceMetadata = {
   "421611": {
     logo: `/assets/eip155:421611.png`,
     rgb: EIP155Colors.arbitrum,
+  },
+  "11155111": {
+    logo: `/assets/eip155:1.png`,
+    rgb: EIP155Colors.sepolia,
+    name: "Sepolia",
   },
 };
 
