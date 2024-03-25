@@ -26,6 +26,8 @@ export class Engine extends ISingleEthereumEngine {
     reject: <T>(value?: T | PromiseLike<T>) => void;
   }[] = [];
 
+  private switchChainTimeout: NodeJS.Timeout | undefined;
+
   constructor(client: ISingleEthereumEngine["client"]) {
     super(client);
     // initialized in init()
@@ -41,7 +43,7 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   public pair: ISingleEthereumEngine["pair"] = async (params) => {
-    await this.client.core.pairing.pair(params);
+    await this.web3wallet.pair(params);
   };
 
   public approveSession: ISingleEthereumEngine["approveSession"] = async (params) => {
@@ -49,14 +51,16 @@ export class Engine extends ISingleEthereumEngine {
     const proposal = this.web3wallet.engine.signClient.proposal.get(id);
     const normalizedRequired = normalizeNamespaces(proposal.requiredNamespaces);
     const normalizedOptional = normalizeNamespaces(proposal.optionalNamespaces);
-    const requiredChain = normalizedRequired[EVM_IDENTIFIER]?.chains?.[0];
-    const requiredParsed = requiredChain ? parseInt(parseChain(requiredChain)) : chainId;
-    const approvedChains = [requiredParsed];
+    const requiredChains = (normalizedRequired[EVM_IDENTIFIER]?.chains || []).map((chain) => {
+      const parsed = parseChain(chain);
+      return parseInt(parsed);
+    });
+    const optionalChains = (normalizedOptional[EVM_IDENTIFIER]?.chains || []).map((chain) => {
+      const parsed = parseChain(chain);
+      return parseInt(parsed);
+    });
 
-    if (requiredParsed !== chainId) {
-      approvedChains.push(chainId);
-    }
-
+    const approvedChains = [...new Set([chainId, ...requiredChains, ...optionalChains])];
     const approveParams = {
       id,
       namespaces: {
@@ -86,8 +90,8 @@ export class Engine extends ISingleEthereumEngine {
     const session = await this.web3wallet.approveSession(approveParams);
     this.chainId = chainId;
     // emit chainChanged if a different chain is approved other than the required
-    if (approvedChains.length > 1) {
-      setTimeout(() => this.changeChain(session.topic, chainId), 2_000);
+    if (chainId !== requiredChains?.[0]) {
+      this.switchChainTimeout = setTimeout(() => this.changeChain(session.topic, chainId), 2_000);
     }
 
     return session;
@@ -102,38 +106,62 @@ export class Engine extends ISingleEthereumEngine {
 
   public updateSession: ISingleEthereumEngine["updateSession"] = async (params) => {
     const { topic, chainId, accounts } = params;
+    if (chainId < 1) {
+      // eslint-disable-next-line no-console
+      return console.error("se-sdk, updateSession Invalid chainId", chainId);
+    }
     const session = this.web3wallet.engine.signClient.session.get(topic);
     const formattedChain = prefixChainWithNamespace(chainId);
     const formattedAccounts = formatAccounts(accounts, chainId);
     const namespaces = session.namespaces[EVM_IDENTIFIER];
+    let shouldUpdateSession = false;
     if (!chainAlreadyInSession(session, chainId)) {
       namespaces?.chains?.push(formattedChain);
+      shouldUpdateSession = true;
     }
 
     if (!accountsAlreadyInSession(session, formattedAccounts)) {
       namespaces.accounts = namespaces.accounts.concat(formattedAccounts);
+      shouldUpdateSession = true;
     }
 
-    await this.web3wallet.updateSession({
-      topic,
-      namespaces: {
-        [EVM_IDENTIFIER]: namespaces,
-      },
-    });
+    if (shouldUpdateSession) {
+      await Promise.all([
+        new Promise<void>((resolve) => {
+          // wait for relayer to publish the update before emitting events
+          const onPublish = (params: { topic: string }) => {
+            if (params.topic === topic) {
+              this.web3wallet.core.relayer.off("relayer_publish", onPublish);
+              resolve();
+            }
+          };
+          this.web3wallet.core.relayer.on("relayer_publish", onPublish);
+        }),
+        this.web3wallet.updateSession({
+          topic,
+          namespaces: {
+            [EVM_IDENTIFIER]: namespaces,
+          },
+        }),
+      ]);
+    }
 
     if (this.chainId !== chainId) {
       await this.changeChain(topic, chainId);
       this.chainId = chainId;
     }
-
-    await this.web3wallet.emitSessionEvent({
-      topic,
-      event: {
-        name: "accountsChanged",
-        data: formattedAccounts,
-      },
-      chainId: formattedChain,
-    });
+    try {
+      await this.web3wallet.emitSessionEvent({
+        topic,
+        event: {
+          name: "accountsChanged",
+          data: formattedAccounts,
+        },
+        chainId: formattedChain,
+      });
+    } catch (e) {
+      this.client.logger.warn(e);
+    }
   };
 
   public approveRequest: ISingleEthereumEngine["approveRequest"] = async (params) => {
@@ -225,9 +253,13 @@ export class Engine extends ISingleEthereumEngine {
       this.client.logger.info(
         `Session request chainId ${event.params.chainId} does not match current chainId ${this.chainId}. Attempting to switch`,
       );
-      await this.switchEthereumChain(event).catch((e) => {
+      try {
+        await this.switchEthereumChain(event);
+      } catch (e) {
         this.client.logger.warn(e);
-      });
+        const error = getSdkError("USER_REJECTED");
+        return this.rejectRequest({ id: event.id, topic: event.topic, error });
+      }
     }
     // delay session request to allow for chain switch to complete
     setTimeout(() => this.client.events.emit("session_request", event), 1_000);
@@ -293,15 +325,19 @@ export class Engine extends ISingleEthereumEngine {
   };
 
   private changeChain = async (topic: string, chainId: number) => {
-    await this.web3wallet.engine.signClient.ping({ topic });
-    await this.web3wallet.emitSessionEvent({
-      topic,
-      event: {
-        name: "chainChanged",
-        data: chainId,
-      },
-      chainId: prefixChainWithNamespace(chainId),
-    });
+    try {
+      clearTimeout(this.switchChainTimeout);
+      await this.web3wallet.emitSessionEvent({
+        topic,
+        event: {
+          name: "chainChanged",
+          data: chainId,
+        },
+        chainId: prefixChainWithNamespace(chainId),
+      });
+    } catch (e) {
+      this.client.logger.warn(e);
+    }
   };
 
   private switchEthereumChain = async (event: SingleEthereumTypes.SessionRequest) => {

@@ -33,6 +33,7 @@ export default function SwitchChainModal() {
         id: requestEvent.id,
         result: {},
       });
+      SettingsStore.setActiveChainId(parseInt(hexChain));
       await web3wallet.updateSession({
         topic,
         chainId: parseInt(hexChain),
