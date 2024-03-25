@@ -55,7 +55,12 @@ export class Engine extends ISingleEthereumEngine {
       const parsed = parseChain(chain);
       return parseInt(parsed);
     });
-    const approvedChains = [...new Set([chainId, ...requiredChains])];
+    const optionalChains = (normalizedOptional[EVM_IDENTIFIER]?.chains || []).map((chain) => {
+      const parsed = parseChain(chain);
+      return parseInt(parsed);
+    });
+
+    const approvedChains = [...new Set([chainId, ...requiredChains, ...optionalChains])];
     const approveParams = {
       id,
       namespaces: {
@@ -111,16 +116,12 @@ export class Engine extends ISingleEthereumEngine {
     const namespaces = session.namespaces[EVM_IDENTIFIER];
     let shouldUpdateSession = false;
     if (!chainAlreadyInSession(session, chainId)) {
-      const requiredChains = session.requiredNamespaces?.[EVM_IDENTIFIER]?.chains || [];
-      namespaces.chains = [formattedChain, ...requiredChains];
+      namespaces?.chains?.push(formattedChain);
       shouldUpdateSession = true;
     }
 
     if (!accountsAlreadyInSession(session, formattedAccounts)) {
-      namespaces.accounts =
-        namespaces.chains
-          ?.map((chain) => formatAccounts(accounts, parseInt(parseChain(chain))))
-          .flat() || [];
+      namespaces.accounts = namespaces.accounts.concat(formattedAccounts);
       shouldUpdateSession = true;
     }
 
@@ -149,15 +150,18 @@ export class Engine extends ISingleEthereumEngine {
       await this.changeChain(topic, chainId);
       this.chainId = chainId;
     }
-
-    await this.web3wallet.emitSessionEvent({
-      topic,
-      event: {
-        name: "accountsChanged",
-        data: formattedAccounts,
-      },
-      chainId: formattedChain,
-    });
+    try {
+      await this.web3wallet.emitSessionEvent({
+        topic,
+        event: {
+          name: "accountsChanged",
+          data: formattedAccounts,
+        },
+        chainId: formattedChain,
+      });
+    } catch (e) {
+      this.client.logger.warn(e);
+    }
   };
 
   public approveRequest: ISingleEthereumEngine["approveRequest"] = async (params) => {
