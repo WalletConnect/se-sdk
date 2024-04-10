@@ -10,7 +10,7 @@ export class SingleEthereum extends ISingleEthereum {
   public events: ISingleEthereum["events"] = new EventEmitter();
   public engine: ISingleEthereum["engine"];
   public metadata: ISingleEthereum["metadata"];
-  public chainId: number;
+  public chainId: ISingleEthereum["chainId"];
 
   static async init(opts: SingleEthereumTypes.Options) {
     const client = new SingleEthereum(opts);
