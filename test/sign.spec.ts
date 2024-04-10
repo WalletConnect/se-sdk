@@ -2,7 +2,7 @@ import { Core } from "@walletconnect/core";
 import { formatJsonRpcError } from "@walletconnect/jsonrpc-utils";
 import { SignClient } from "@walletconnect/sign-client";
 import { ICore, ISignClient, SessionTypes } from "@walletconnect/types";
-import { getSdkError } from "@walletconnect/utils";
+import { getSdkError, buildAuthObject } from "@walletconnect/utils";
 import { Wallet as CryptoWallet } from "@ethersproject/wallet";
 import { TransactionRequest } from "@ethersproject/abstract-provider";
 
@@ -336,6 +336,63 @@ describe("Sign Integration", () => {
       }),
     ]);
 
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  });
+
+  it("should receive session_authenticate", async () => {
+    dapp = await SignClient.init({
+      ...TEST_CORE_OPTIONS,
+      name: "Dapp",
+    });
+    const { uri, response } = await dapp.authenticate({
+      chains: ["eip155:1", "eip155:2"],
+      domain: "localhost",
+      nonce: "1",
+      uri: "aud",
+      methods: ["personal_sign"],
+      resources: [],
+    });
+    uriString = uri || "";
+    wallet = await SingleEthereum.init({
+      core,
+      name: "wallet",
+      metadata: {} as any,
+    });
+
+    // first pair and approve session
+    await Promise.all([
+      new Promise((resolve) => {
+        wallet.on("session_authenticate", async (payload) => {
+          const { id, params } = payload;
+          // auto approve the first chain
+          const chainId = params.authPayload.chains[0];
+          const message = wallet.formatAuthMessage({
+            payload: payload.params.authPayload,
+            address: `${chainId}:${cryptoWallet.address}`,
+          });
+          const sig = await cryptoWallet.signMessage(message);
+          const auth = buildAuthObject(
+            payload.params.authPayload,
+            {
+              t: "eip191",
+              s: sig,
+            },
+            `${chainId}:${cryptoWallet.address}`,
+          );
+          const result = await wallet.approveSessionAuthenticate({
+            id,
+            auths: [auth],
+          });
+          const { session } = result;
+          resolve(session);
+        });
+      }),
+      wallet.pair({ uri: uriString }),
+    ]);
+
+    const { auths, session } = await response();
+    console.log("auths", auths);
+    console.log("session", session);
     await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 

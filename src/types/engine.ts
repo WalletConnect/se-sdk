@@ -1,5 +1,5 @@
 import { ErrorResponse } from "@walletconnect/jsonrpc-utils";
-import { PendingRequestTypes, ProposalTypes, SessionTypes } from "@walletconnect/types";
+import { PendingRequestTypes, ProposalTypes, SessionTypes, AuthTypes } from "@walletconnect/types";
 import { IWeb3Wallet } from "@walletconnect/web3wallet";
 import { ISingleEthereum, SingleEthereumTypes } from "./client";
 export abstract class ISingleEthereumEngine {
@@ -60,10 +60,19 @@ export abstract class ISingleEthereumEngine {
     address: string;
   }): Promise<void>;
 
-  public abstract formatAuthMessage(
-    payload: SingleEthereumTypes.CacaoRequestPayload,
-    address: string,
-  ): string;
+  public abstract formatAuthMessage(params: {
+    payload: SingleEthereumTypes.CacaoRequestPayload;
+    address: string;
+  }): string;
+
+  public abstract approveSessionAuthenticate(
+    params: AuthTypes.ApproveSessionAuthenticateParams,
+  ): Promise<{ session: SessionTypes.Struct | undefined }>;
+
+  public abstract rejectSessionAuthenticate(params: {
+    id: number;
+    reason: ErrorResponse;
+  }): Promise<void>;
 
   public abstract rejectAuthRequest(params: { id: number; error: ErrorResponse }): Promise<void>;
 

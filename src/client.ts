@@ -139,9 +139,9 @@ export class SingleEthereum extends ISingleEthereum {
 
   // ---------- Auth ----------------------------------------------- //
 
-  public formatAuthMessage: ISingleEthereum["formatAuthMessage"] = (payload, address) => {
+  public formatAuthMessage: ISingleEthereum["formatAuthMessage"] = (params) => {
     try {
-      return this.engine.formatAuthMessage(payload, address);
+      return this.engine.formatAuthMessage(params);
     } catch (error: any) {
       this.logger.error(error.message);
       throw error;
@@ -169,6 +169,24 @@ export class SingleEthereum extends ISingleEthereum {
   public getPendingAuthRequests: ISingleEthereum["getPendingAuthRequests"] = () => {
     try {
       return this.engine.getPendingAuthRequests();
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  public approveSessionAuthenticate: ISingleEthereum["approveSessionAuthenticate"] = (params) => {
+    try {
+      return this.engine.approveSessionAuthenticate(params);
+    } catch (error: any) {
+      this.logger.error(error.message);
+      throw error;
+    }
+  };
+
+  public rejectSessionAuthenticate: ISingleEthereum["rejectSessionAuthenticate"] = (params) => {
+    try {
+      return this.engine.rejectSessionAuthenticate(params);
     } catch (error: any) {
       this.logger.error(error.message);
       throw error;

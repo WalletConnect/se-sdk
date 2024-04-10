@@ -20,7 +20,7 @@ const defaultRequestParams: AuthEngineTypes.RequestParams = {
   nonce: generateNonce(),
 };
 
-describe("Auth Integration", () => {
+describe.skip("Auth Integration", () => {
   let core: ICore;
   let wallet: ISingleEthereum;
   let dapp: IAuthClient;

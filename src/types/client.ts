@@ -1,5 +1,5 @@
 import EventEmmiter, { EventEmitter } from "events";
-import { CoreTypes, ICore, Verify } from "@walletconnect/types";
+import { CoreTypes, ICore, Verify, AuthTypes } from "@walletconnect/types";
 import { ISingleEthereumEngine } from "./engine";
 import { Logger } from "@walletconnect/logger";
 import { AuthEngineTypes } from "@walletconnect/auth-client";
@@ -11,7 +11,8 @@ export declare namespace SingleEthereumTypes {
     | "session_proposal_error"
     | "session_request"
     | "session_delete"
-    | "auth_request";
+    | "auth_request"
+    | "session_authenticate";
 
   interface BaseEventArgs<T = unknown> {
     id: number;
@@ -37,12 +38,14 @@ export declare namespace SingleEthereumTypes {
     code: number;
   };
 
+  type SessionAuthenticate = BaseEventArgs<AuthTypes.AuthRequestEventArgs>;
   interface EventArguments {
     session_proposal: SessionProposal;
     session_proposal_error: SessionProposalError;
     session_request: SessionRequest;
     session_delete: SessionDelete;
     auth_request: AuthRequest;
+    session_authenticate: SessionAuthenticate;
   }
 
   type CacaoRequestPayload = AuthEngineTypes.CacaoRequestPayload;
@@ -118,6 +121,10 @@ export abstract class ISingleEthereum {
   public abstract approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"];
   public abstract rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"];
   public abstract getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"];
+
+  // multi chain auth //
+  public abstract approveSessionAuthenticate: ISingleEthereumEngine["approveSessionAuthenticate"];
+  public abstract rejectSessionAuthenticate: ISingleEthereumEngine["rejectSessionAuthenticate"];
 
   // ---------- Event Handlers ----------------------------------------------- //
   public abstract on: <E extends SingleEthereumTypes.Event>(
