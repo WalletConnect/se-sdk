@@ -10,6 +10,7 @@ export class SingleEthereum extends ISingleEthereum {
   public events: ISingleEthereum["events"] = new EventEmitter();
   public engine: ISingleEthereum["engine"];
   public metadata: ISingleEthereum["metadata"];
+  public chainId: ISingleEthereum["chainId"];
 
   static async init(opts: SingleEthereumTypes.Options) {
     const client = new SingleEthereum(opts);
@@ -24,6 +25,7 @@ export class SingleEthereum extends ISingleEthereum {
     this.name = opts.name || CLIENT_CONTEXT;
     this.core = opts.core;
     this.logger = this.core.logger;
+    this.chainId = opts.chainId;
     this.engine = new Engine(this);
   }
 

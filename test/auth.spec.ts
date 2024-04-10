@@ -42,7 +42,7 @@ describe("Auth Integration", () => {
       metadata: {} as any,
       name: "dapp",
     });
-    wallet = await SingleEthereum.init({ core, name: "wallet", metadata: {} as any });
+    wallet = await SingleEthereum.init({ core, name: "wallet", metadata: {} as any, chainId: 1 });
     expect(wallet).to.be.exist;
     expect(dapp).to.be.exist;
     expect(core).to.be.exist;

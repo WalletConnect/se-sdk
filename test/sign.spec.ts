@@ -58,6 +58,7 @@ describe("Sign Integration", () => {
       core,
       name: "wallet",
       metadata: {} as any,
+      chainId: 1,
     });
     await new Promise((resolve) => setTimeout(resolve, 1000));
     expect(wallet).to.be.exist;
@@ -284,6 +285,7 @@ describe("Sign Integration", () => {
       core,
       name: "wallet",
       metadata: {} as any,
+      chainId: 1,
     });
 
     // first pair and approve session
@@ -670,6 +672,7 @@ describe("Sign Integration", () => {
       core,
       name: "wallet",
       metadata: {} as any,
+      chainId: 1,
     });
     const expectedError = getSdkError("UNSUPPORTED_CHAINS");
     await Promise.all([
@@ -707,6 +710,7 @@ describe("Sign Integration", () => {
       core,
       name: "wallet",
       metadata: {} as any,
+      chainId: 1,
     });
     const expectedError = getSdkError("UNSUPPORTED_NAMESPACE_KEY");
     await Promise.all([
@@ -744,6 +748,7 @@ describe("Sign Integration", () => {
       core,
       name: "wallet",
       metadata: {} as any,
+      chainId: 1,
     });
     await Promise.all([
       new Promise<void>((resolve) => {
