@@ -19,7 +19,7 @@ import {
 
 export class Engine extends ISingleEthereumEngine {
   public web3wallet: IWeb3Wallet;
-  public chainId?: number;
+  public chainId: number;
   private pendingInternalRequests: {
     id: number;
     resolve: <T>(value?: T | PromiseLike<T>) => void;
@@ -30,11 +30,13 @@ export class Engine extends ISingleEthereumEngine {
 
   constructor(client: ISingleEthereumEngine["client"]) {
     super(client);
+    this.chainId = 1;
     // initialized in init()
     this.web3wallet = {} as IWeb3Wallet;
   }
 
   public init = async () => {
+    this.chainId = this.client.chainId;
     this.web3wallet = await Web3Wallet.init({
       core: this.client.core,
       metadata: this.client.metadata,

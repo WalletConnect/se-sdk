@@ -284,6 +284,7 @@ describe("Sign Integration", () => {
       core,
       name: "wallet",
       metadata: {} as any,
+      chainId: 1,
     });
 
     // first pair and approve session

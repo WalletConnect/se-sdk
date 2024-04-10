@@ -52,6 +52,7 @@ export declare namespace SingleEthereumTypes {
     core: ICore;
     metadata: Metadata;
     name?: string;
+    chainId: number;
   }
 
   type Metadata = CoreTypes.Metadata;
@@ -95,6 +96,7 @@ export abstract class ISingleEthereum {
   public abstract logger: Logger;
   public abstract core: ICore;
   public abstract metadata: SingleEthereumTypes.Metadata;
+  public abstract chainId: number;
 
   constructor(public opts: SingleEthereumTypes.Options) {}
 
