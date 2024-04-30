@@ -10,6 +10,7 @@ interface ModalData {
   requestEvent?: SingleEthereumTypes.EventArguments["session_request"];
   requestSession?: SessionTypes.Struct;
   authRequest?: SingleEthereumTypes.AuthRequest;
+  sessionAuthenticate?: SingleEthereumTypes.EventArguments["session_authenticate"];
 }
 interface State {
   open: boolean;
@@ -20,7 +21,8 @@ interface State {
     | "SessionSendTransactionModal"
     | "SessionUnsuportedMethodModal"
     | "AuthRequestModal"
-    | "SwitchChainModal";
+    | "SwitchChainModal"
+    | "SessionAuthenticateModal";
   data?: ModalData;
 }
 

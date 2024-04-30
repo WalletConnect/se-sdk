@@ -77,6 +77,13 @@ export default function useWalletConnectEventsManager() {
     [],
   );
 
+  const onSessionAuthenticate = useCallback(
+    (request: SingleEthereumTypes.EventArguments["session_authenticate"]) => {
+      ModalStore.open("SessionAuthenticateModal", { sessionAuthenticate: request });
+    },
+    [],
+  );
+
   /******************************************************************************
    * Set up WalletConnect event listeners
    *****************************************************************************/
@@ -88,6 +95,7 @@ export default function useWalletConnectEventsManager() {
         console.log("delete", data);
       });
       web3wallet.on("auth_request", onAuthRequest);
+      web3wallet.on("session_authenticate", onSessionAuthenticate);
     }
 
     return () => {
@@ -98,6 +106,7 @@ export default function useWalletConnectEventsManager() {
           console.log("delete", data);
         });
         web3wallet.off("auth_request", onAuthRequest);
+        web3wallet.off("session_authenticate", onSessionAuthenticate);
       }
     };
   }, [web3WalletReady, onSessionProposal, onSessionRequest]);
