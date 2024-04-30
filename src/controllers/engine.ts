@@ -57,12 +57,8 @@ export class Engine extends ISingleEthereumEngine {
       const parsed = parseChain(chain);
       return parseInt(parsed);
     });
-    const optionalChains = (normalizedOptional[EVM_IDENTIFIER]?.chains || []).map((chain) => {
-      const parsed = parseChain(chain);
-      return parseInt(parsed);
-    });
 
-    const approvedChains = [...new Set([chainId, ...requiredChains, ...optionalChains])];
+    const approvedChains = [...new Set([chainId, ...requiredChains])];
     const approveParams = {
       id,
       namespaces: {
