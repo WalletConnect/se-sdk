@@ -68,7 +68,7 @@ export class Engine extends ISingleEthereumEngine {
           chains: approvedChains.map((chain) => prefixChainWithNamespace(chain)),
           methods: normalizedRequired[EVM_IDENTIFIER]?.methods?.length
             ? normalizedRequired[EVM_IDENTIFIER].methods
-            : ["eth_sendTransaction", "personal_sign", "wallet_switchEthereumChain"],
+            : ["eth_sendTransaction", "personal_sign"],
           events: normalizedRequired[EVM_IDENTIFIER]?.events?.length
             ? normalizedRequired[EVM_IDENTIFIER].events
             : ["chainChanged", "accountsChanged"],
