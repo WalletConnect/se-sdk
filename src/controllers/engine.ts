@@ -57,12 +57,8 @@ export class Engine extends ISingleEthereumEngine {
       const parsed = parseChain(chain);
       return parseInt(parsed);
     });
-    const optionalChains = (normalizedOptional[EVM_IDENTIFIER]?.chains || []).map((chain) => {
-      const parsed = parseChain(chain);
-      return parseInt(parsed);
-    });
 
-    const approvedChains = [...new Set([chainId, ...requiredChains, ...optionalChains])];
+    const approvedChains = [...new Set([chainId, ...requiredChains])];
     const approveParams = {
       id,
       namespaces: {
@@ -72,7 +68,7 @@ export class Engine extends ISingleEthereumEngine {
           chains: approvedChains.map((chain) => prefixChainWithNamespace(chain)),
           methods: normalizedRequired[EVM_IDENTIFIER]?.methods?.length
             ? normalizedRequired[EVM_IDENTIFIER].methods
-            : ["eth_sendTransaction", "personal_sign"],
+            : ["eth_sendTransaction", "personal_sign", "wallet_switchEthereumChain"],
           events: normalizedRequired[EVM_IDENTIFIER]?.events?.length
             ? normalizedRequired[EVM_IDENTIFIER].events
             : ["chainChanged", "accountsChanged"],
