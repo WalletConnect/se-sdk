@@ -23,6 +23,7 @@ export async function createWeb3Wallet() {
         url: "https://walletconnect.com/",
         icons: ["https://avatars.githubusercontent.com/u/37784886"],
       },
+      chainId: 1,
     });
 
     SettingsStore.setWeb3WalletReady(true);
