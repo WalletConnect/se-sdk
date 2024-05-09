@@ -40,6 +40,9 @@ export class Engine extends ISingleEthereumEngine {
     this.web3wallet = await Web3Wallet.init({
       core: this.client.core,
       metadata: this.client.metadata,
+      signConfig: this.client.signConfig || {
+        disableRequestQueue: true,
+      },
     });
     this.initializeEventListeners();
   };

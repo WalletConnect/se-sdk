@@ -53,6 +53,7 @@ export declare namespace SingleEthereumTypes {
     metadata: Metadata;
     name?: string;
     chainId: number;
+    signConfig?: Web3WalletTypes.SignConfig;
   }
 
   type Metadata = CoreTypes.Metadata;
@@ -97,6 +98,7 @@ export abstract class ISingleEthereum {
   public abstract core: ICore;
   public abstract metadata: SingleEthereumTypes.Metadata;
   public abstract chainId: number;
+  public abstract signConfig: Web3WalletTypes.SignConfig;
 
   constructor(public opts: SingleEthereumTypes.Options) {}
 
