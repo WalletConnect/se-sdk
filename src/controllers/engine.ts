@@ -258,14 +258,6 @@ export class Engine extends ISingleEthereumEngine {
       event.params.chainId = this.chainId.toString();
     }
 
-    try {
-      await this.switchEthereumChain(event);
-    } catch (e) {
-      this.client.logger.warn(e);
-      const error = getSdkError("USER_REJECTED");
-      return this.rejectRequest({ id: event.id, topic: event.topic, error });
-    }
-
     if (parseInt(event.params.chainId) !== this.chainId || this.isSwitchChainRequest(event)) {
       this.client.logger.info(
         `Session request chainId ${event.params.chainId} does not match current chainId ${this.chainId}. Attempting to switch`,
