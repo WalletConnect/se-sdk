@@ -422,6 +422,66 @@ describe("Sign Integration", () => {
     ]);
     expect(wallet.engine.chainId).to.eq(originalChainId);
   });
+  it("should receive wallet_switchEthereumChain in the wallet's active chainId", async () => {
+    // first pair and approve session
+    await Promise.all([
+      new Promise((resolve) => {
+        wallet.on("session_proposal", async (sessionProposal) => {
+          const { id, params } = sessionProposal;
+          session = await wallet.approveSession({
+            id,
+            chainId: TEST_ETHEREUM_CHAIN_PARSED,
+            accounts: [cryptoWallet.address],
+          });
+          resolve(session);
+        });
+      }),
+      sessionApproval(),
+      wallet.pair({ uri: uriString }),
+    ]);
+    const originalChainId = wallet.engine.chainId;
+    const expectedChainId = 5;
+
+    expect(originalChainId).to.not.eq(expectedChainId);
+
+    // change chainId
+    wallet.engine.chainId = expectedChainId;
+
+    const requestChainId = 0x10;
+
+    await Promise.all([
+      new Promise<void>((resolve) => {
+        wallet.on("session_request", async (sessionRequest) => {
+          const { id, params, topic, verifyContext } = sessionRequest;
+          expect(params.request.method).to.eq("wallet_switchEthereumChain");
+          expect(params.chainId).to.eq(expectedChainId.toString());
+          expect(params.chainId).to.not.eq(requestChainId);
+          await wallet.approveRequest({
+            id,
+            topic: session.topic,
+            result: null,
+          });
+          resolve();
+        });
+      }),
+      new Promise<void>(async (resolve) => {
+        const result = await dapp.request({
+          topic: session.topic,
+          request: {
+            method: "wallet_switchEthereumChain",
+            params: [
+              {
+                chainId: requestChainId,
+              },
+            ],
+          },
+          chainId: TEST_ETHEREUM_CHAIN,
+        });
+        expect(result).to.be.null;
+        resolve();
+      }),
+    ]);
+  });
 
   it("should handle reject to session request in different chain", async () => {
     // first pair and approve session

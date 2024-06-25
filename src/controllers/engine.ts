@@ -250,6 +250,14 @@ export class Engine extends ISingleEthereumEngine {
   private onSessionRequest = async (event: SingleEthereumTypes.SessionRequest) => {
     event.params.chainId = parseChain(event.params.chainId);
 
+    if (
+      ["wallet_switchEthereumChain", "wallet_addEthereumChain"].includes(
+        event.params.request.method,
+      )
+    ) {
+      event.params.chainId = this.chainId.toString();
+    }
+
     if (parseInt(event.params.chainId) !== this.chainId || this.isSwitchChainRequest(event)) {
       this.client.logger.info(
         `Session request chainId ${event.params.chainId} does not match current chainId ${this.chainId}. Attempting to switch`,
