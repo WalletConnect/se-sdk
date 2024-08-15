@@ -21,19 +21,6 @@ export default function SettingsPage() {
         <Text color="$gray400">@walletconnect/se-sdk</Text>
         <Text color="$gray400">{packageJSON.dependencies["@walletconnect/se-sdk"]}</Text>
       </Row>
-      <Row justify="space-between" align="center">
-        <Text color="$gray400">@walletconnect/core</Text>
-        <Text color="$gray400">{packageJSON.dependencies["@walletconnect/core"]}</Text>
-      </Row>
-      <Row justify="space-between" align="center">
-        <Text color="$gray400">@walletconnect/utils</Text>
-        <Text color="$gray400">{packageJSON.dependencies["@walletconnect/utils"]}</Text>
-      </Row>
-      <Row justify="space-between" align="center">
-        <Text color="$gray400">@walletconnect/types</Text>
-        <Text color="$gray400">{packageJSON.dependencies["@walletconnect/types"]}</Text>
-      </Row>
-
       <Divider y={2} />
 
       <Text h4 css={{ marginBottom: "$5" }}>
