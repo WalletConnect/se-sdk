@@ -2,7 +2,7 @@
   "name": "@walletconnect/se-sdk",
   "description": "Single-Ethreum-SDK for WalletConnect Protocol",
   "private": false,
-  "version": "1.9.0",
+  "version": "1.10.0",
   "author": "WalletConnect, Inc. <walletconnect.com>",
   "homepage": "https://github.com/walletconnect/walletconnect-monorepo/",
   "license": "Apache-2.0",
@@ -33,11 +33,12 @@
     "install:all": "yarn && cd ./examples/dapp && yarn && cd ./../wallet && yarn"
   },
   "dependencies": {
-    "@walletconnect/web3wallet": "1.13.0"
+    "@walletconnect/web3wallet": "1.14.0"
   },
   "devDependencies": {
     "@ethersproject/wallet": "^5.7.0",
     "@rollup/plugin-commonjs": "24.0.1",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "13.3.0",
     "@typescript-eslint/eslint-plugin": "5.33.0",
     "@typescript-eslint/parser": "5.33.0",
@@ -45,6 +46,7 @@
     "eslint-config-prettier": "8.5.0",
     "eslint-config-standard": "17.0.0",
     "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-n": "^15.6.1",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-promise": "6.0.0",
@@ -57,8 +59,7 @@
     "rollup-plugin-polyfill-node": "0.10.2",
     "typescript": "4.7.4",
     "utf-8-validate": "6.0.3",
-    "vitest": "^0.31.1",
-    "eslint-plugin-n": "^15.6.1"
+    "vitest": "^0.31.1"
   },
   "exports": {
     ".": {

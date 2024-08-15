@@ -2,11 +2,13 @@ import esbuild from "rollup-plugin-esbuild";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import nodePolyfills from "rollup-plugin-polyfill-node";
 import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
 import { name, dependencies } from "./package.json";
 
 const input = "./src/index.ts";
 const plugins = [
   nodeResolve({ preferBuiltins: false, browser: true }),
+  json(),
   commonjs(),
   nodePolyfills(),
   esbuild({
