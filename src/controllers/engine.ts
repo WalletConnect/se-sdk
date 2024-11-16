@@ -1,6 +1,6 @@
 import { formatJsonRpcError, formatJsonRpcResult } from "@walletconnect/jsonrpc-utils";
 import { getSdkError, normalizeNamespaces } from "@walletconnect/utils";
-import { Web3Wallet, IWeb3Wallet } from "@walletconnect/web3wallet";
+import { IWalletKit, WalletKit } from "@reown/walletkit";
 import { EVM_IDENTIFIER, SWITCH_CHAIN_METHODS } from "../constants";
 import { ISingleEthereumEngine, SingleEthereumTypes } from "../types";
 import {
@@ -14,11 +14,10 @@ import {
   parseProposals,
   parseProposal,
   accountsAlreadyInSession,
-  formatAuthAddress,
 } from "../utils";
 
 export class Engine extends ISingleEthereumEngine {
-  public web3wallet: IWeb3Wallet;
+  public web3wallet: IWalletKit;
   public chainId: number;
   private pendingInternalRequests: {
     id: number;
@@ -32,12 +31,12 @@ export class Engine extends ISingleEthereumEngine {
     super(client);
     this.chainId = 1;
     // initialized in init()
-    this.web3wallet = {} as IWeb3Wallet;
+    this.web3wallet = {} as IWalletKit;
   }
 
   public init = async () => {
     this.chainId = this.client.chainId;
-    this.web3wallet = await Web3Wallet.init({
+    this.web3wallet = await WalletKit.init({
       core: this.client.core,
       metadata: this.client.metadata,
       signConfig: this.client.signConfig || {
@@ -212,37 +211,31 @@ export class Engine extends ISingleEthereumEngine {
 
   // ---------- Auth ----------------------------------------------- //
 
-  public approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"] = async (params) => {
-    const { id, signature, address } = params;
-    return await this.web3wallet.respondAuthRequest(
-      {
-        id,
-        signature: {
-          s: signature,
-          t: "eip191",
-        },
-      },
-      formatAuthAddress(address),
-    );
+  public approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"] = async (_params) => {
+    // const { id, signature, address } = params;
+    return {} as any;
+    // return await this.web3wallet.respondAuthRequest(
+    //   {
+    //     id,
+    //     signature: {
+    //       s: signature,
+    //       t: "eip191",
+    //     },
+    //   },
+    //   formatAuthAddress(address),
+    // );
   };
 
-  public rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"] = async (params) => {
-    const { id, error } = params;
-    return await this.web3wallet.respondAuthRequest(
-      {
-        id,
-        error,
-      },
-      "",
-    );
-  };
-
-  public getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"] = () => {
-    return this.web3wallet.getPendingAuthRequests();
-  };
-
-  public formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"] = (payload, address) => {
-    return this.web3wallet.formatMessage(payload, formatAuthAddress(address));
+  public rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"] = async (_params) => {
+    // const { id, error } = params;
+    return {} as any;
+    // return await this.web3wallet.respondAuthRequest(
+    //   {
+    //     id,
+    //     error,
+    //   },
+    //   "",
+    // );
   };
 
   // ---------- Private ----------------------------------------------- //
@@ -311,15 +304,11 @@ export class Engine extends ISingleEthereumEngine {
     await this.disconnectPairings();
   };
 
-  private onAuthRequest = (event: SingleEthereumTypes.AuthRequest) => {
-    this.client.events.emit("auth_request", event);
-  };
-
   private initializeEventListeners = () => {
     this.web3wallet.on("session_proposal", this.onSessionProposal);
     this.web3wallet.on("session_request", this.onSessionRequest);
     this.web3wallet.on("session_delete", this.onSessionDelete);
-    this.web3wallet.on("auth_request", this.onAuthRequest);
+    // this.web3wallet.on("auth_request", this.onAuthRequest);
   };
 
   private disconnectPairings = async () => {

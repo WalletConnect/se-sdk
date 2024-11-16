@@ -2,16 +2,10 @@ import EventEmmiter, { EventEmitter } from "events";
 import { CoreTypes, ICore, Verify } from "@walletconnect/types";
 import { ISingleEthereumEngine } from "./engine";
 import { Logger } from "@walletconnect/logger";
-import { AuthEngineTypes } from "@walletconnect/auth-client";
-import { Web3WalletTypes } from "@walletconnect/web3wallet";
+import { WalletKitTypes } from "@reown/walletkit";
 
 export declare namespace SingleEthereumTypes {
-  type Event =
-    | "session_proposal"
-    | "session_proposal_error"
-    | "session_request"
-    | "session_delete"
-    | "auth_request";
+  type Event = "session_proposal" | "session_proposal_error" | "session_request" | "session_delete";
 
   interface BaseEventArgs<T = unknown> {
     id: number;
@@ -26,11 +20,9 @@ export declare namespace SingleEthereumTypes {
     verifyContext: Verify.Context;
   };
 
-  type SessionProposal = Web3WalletTypes.SessionProposal;
+  type SessionProposal = WalletKitTypes.SessionProposal;
 
   type SessionDelete = Omit<BaseEventArgs, "params">;
-
-  type AuthRequest = Web3WalletTypes.AuthRequest;
 
   type SessionProposalError = {
     message: string;
@@ -42,18 +34,14 @@ export declare namespace SingleEthereumTypes {
     session_proposal_error: SessionProposalError;
     session_request: SessionRequest;
     session_delete: SessionDelete;
-    auth_request: AuthRequest;
   }
-
-  type CacaoRequestPayload = AuthEngineTypes.CacaoRequestPayload;
-  type PendingAuthRequest = AuthEngineTypes.PendingRequest;
 
   interface Options {
     core: ICore;
     metadata: Metadata;
     name?: string;
     chainId: number;
-    signConfig?: Web3WalletTypes.SignConfig;
+    signConfig?: WalletKitTypes.SignConfig;
   }
 
   type Metadata = CoreTypes.Metadata;
@@ -98,7 +86,7 @@ export abstract class ISingleEthereum {
   public abstract core: ICore;
   public abstract metadata: SingleEthereumTypes.Metadata;
   public abstract chainId: number;
-  public abstract signConfig: Web3WalletTypes.SignConfig;
+  public abstract signConfig: WalletKitTypes.SignConfig;
 
   constructor(public opts: SingleEthereumTypes.Options) {}
 
@@ -118,10 +106,10 @@ export abstract class ISingleEthereum {
   public abstract getPendingSessionRequests: ISingleEthereumEngine["getPendingSessionRequests"];
 
   // auth //
-  public abstract formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"];
+  // public abstract formatAuthMessage: ISingleEthereumEngine["formatAuthMessage"];
   public abstract approveAuthRequest: ISingleEthereumEngine["approveAuthRequest"];
   public abstract rejectAuthRequest: ISingleEthereumEngine["rejectAuthRequest"];
-  public abstract getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"];
+  // public abstract getPendingAuthRequests: ISingleEthereumEngine["getPendingAuthRequests"];
 
   // ---------- Event Handlers ----------------------------------------------- //
   public abstract on: <E extends SingleEthereumTypes.Event>(
