@@ -9,7 +9,6 @@ interface ModalData {
   proposal?: SingleEthereumTypes.EventArguments["session_proposal"];
   requestEvent?: SingleEthereumTypes.EventArguments["session_request"];
   requestSession?: SessionTypes.Struct;
-  authRequest?: SingleEthereumTypes.AuthRequest;
 }
 interface State {
   open: boolean;

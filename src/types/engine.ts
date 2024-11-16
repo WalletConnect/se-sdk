@@ -1,9 +1,9 @@
 import { ErrorResponse } from "@walletconnect/jsonrpc-utils";
 import { PendingRequestTypes, ProposalTypes, SessionTypes } from "@walletconnect/types";
-import { IWeb3Wallet } from "@walletconnect/web3wallet";
-import { ISingleEthereum, SingleEthereumTypes } from "./client";
+import { ISingleEthereum } from "./client";
+import { IWalletKit } from "@reown/walletkit";
 export abstract class ISingleEthereumEngine {
-  public abstract web3wallet: IWeb3Wallet;
+  public abstract web3wallet: IWalletKit;
   public abstract chainId?: number;
 
   constructor(public client: ISingleEthereum) {}
@@ -60,12 +60,5 @@ export abstract class ISingleEthereumEngine {
     address: string;
   }): Promise<void>;
 
-  public abstract formatAuthMessage(
-    payload: SingleEthereumTypes.CacaoRequestPayload,
-    address: string,
-  ): string;
-
   public abstract rejectAuthRequest(params: { id: number; error: ErrorResponse }): Promise<void>;
-
-  public abstract getPendingAuthRequests(): Record<number, SingleEthereumTypes.PendingAuthRequest>;
 }
