@@ -141,22 +141,27 @@ export function ClientContextProvider({ children }: { children: ReactNode | Reac
   const createClient = useCallback(async () => {
     try {
       setIsInitializing(true);
+      console.log("createClient...");
+      const result = prompt("Number of clients to create") || "1";
+      for (let i = 0; i < parseInt(result || "10"); i++) {
+        console.log("creating client :", i + 1);
+        const provider = await EthereumProvider.init({
+          projectId: DEFAULT_PROJECT_ID || "",
+          optionalChains: [1],
+          optionalMethods: [
+            "eth_sendTransaction",
+            "personal_sign",
+            "eth_signTransaction",
+            "eth_sign",
+            "eth_signTypedData",
+            "wallet_switchEthereumChain",
+          ],
+          showQrModal: true,
+        });
 
-      const provider = await EthereumProvider.init({
-        projectId: DEFAULT_PROJECT_ID || "",
-        optionalChains: [1],
-        optionalMethods: [
-          "eth_sendTransaction",
-          "personal_sign",
-          "eth_signTransaction",
-          "eth_sign",
-          "eth_signTypedData",
-          "wallet_switchEthereumChain",
-        ],
-        showQrModal: true,
-      });
-      setEthereumProvider(provider);
-      setClient(provider.signer.client);
+        setEthereumProvider(provider);
+        setClient(provider.signer.client);
+      }
     } catch (err) {
       throw err;
     } finally {
